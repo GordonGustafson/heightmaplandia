@@ -75,7 +75,7 @@ function addSphereAtLocation(initialLocation, scene) {
 function createScene() {
     var scene = initializeScene();
 
-    var camera = addCamera(new BABYLON.Vector3(0, 1, 0), scene);
+    var camera = addCamera(new BABYLON.Vector3(0, 2, 0), scene);
 
     var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
     light.intensity = .5;
