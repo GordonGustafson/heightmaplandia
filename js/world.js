@@ -1,9 +1,15 @@
 var canvas = document.getElementById("renderCanvas");
 var engine = new BABYLON.Engine(canvas, true);
 
-var MAP_WIDTH = 50;
-var MAP_HEIGHT = 50;
-var MAP_SUBDIVISIONS = 3;
+var PATH_TO_HEIGHTMAP = "perlin_noise.png";
+var MAP_WIDTH = 500;
+var MAP_HEIGHT = 500;
+var MAP_SUBDIVISIONS = 50;
+var MIN_HEIGHT_DISPLACEMENT = 0;
+var MAX_HEIGHT_DISPLACEMENT = 25;
+var MAKE_MESH_UPDATABLE = true;
+
+var PLAYER_HEIGHT = 1;
 
 function initializeScene() {
     var scene = new BABYLON.Scene(engine);
@@ -19,7 +25,7 @@ function addCamera(initialLocation, scene) {
     camera.applyGravity = true;
     camera.checkCollisions = true;
     // ellipsoid around camera that determines player collisions
-    camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
+    camera.ellipsoid = new BABYLON.Vector3(1, PLAYER_HEIGHT, 1);
     // attach camera to global canvas and prevent other sources from handling its javascript events
     camera.attachControl(canvas, false);
     // how fast your player can move. Must be greater than downward gravity.
@@ -54,9 +60,16 @@ function setupAdditionalCameraControls(camera) {
     };
 }
 
-function addGround(scene) {
-    var ground = BABYLON.Mesh.CreateGround("ground", MAP_WIDTH, MAP_HEIGHT, MAP_SUBDIVISIONS, scene);
+function addHeightmappedGround(scene) {
+    var ground = BABYLON.Mesh.CreateGroundFromHeightMap(
+        "ground", PATH_TO_HEIGHTMAP, MAP_WIDTH, MAP_HEIGHT, MAP_SUBDIVISIONS,
+        MIN_HEIGHT_DISPLACEMENT, MAX_HEIGHT_DISPLACEMENT, scene, MAKE_MESH_UPDATABLE);
     ground.checkCollisions = true;
+    ground.position.y = 0;
+
+    var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
+    groundMaterial.diffuseTexture = new BABYLON.Texture(PATH_TO_HEIGHTMAP, scene);
+    ground.material = groundMaterial;
     return ground;
 }
 
@@ -75,23 +88,12 @@ function addSphereAtLocation(initialLocation, scene) {
 function createScene() {
     var scene = initializeScene();
 
-    var camera = addCamera(new BABYLON.Vector3(0, 2, 0), scene);
+    var camera = addCamera(new BABYLON.Vector3(0, MAX_HEIGHT_DISPLACEMENT + PLAYER_HEIGHT, 0), scene);
 
     var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
     light.intensity = .5;
 
-    addGround(scene);
-
-    addSphereAtLocation(new BABYLON.Vector3(3, 1, 5), scene);
-
-    var ramp = BABYLON.Mesh.CreateBox("box", 3, scene);
-    ramp.position.x = -3
-    ramp.position.z = 5;
-    ramp.position.y = .5;
-    ramp.scaling.x = .5;
-    ramp.scaling.y = 2;
-    ramp.rotation.z = Math.PI / 3;
-    ramp.checkCollisions = true;
+    addHeightmappedGround(scene);
 
     return scene;
 };
