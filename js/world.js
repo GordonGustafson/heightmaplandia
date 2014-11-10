@@ -84,6 +84,18 @@ function addSphereAtLocation(initialLocation, scene) {
     sphere.checkCollisions = true;
 }
 
+function createSkybox(scene){
+	// Skybox
+	var skybox = BABYLON.Mesh.CreateBox("skyBox", 10000.0, scene);
+	var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+	skyboxMaterial.backFaceCulling = false;
+	skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("skybox/skybox", scene);
+	skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+	skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+	skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+	skybox.material = skyboxMaterial;
+}
+
 
 function createScene() {
     var scene = initializeScene();
@@ -94,6 +106,7 @@ function createScene() {
     light.intensity = .5;
 
     addHeightmappedGround(scene);
+    createSkybox(scene);
 
     return scene;
 };
