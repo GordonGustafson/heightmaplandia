@@ -2,11 +2,12 @@ var canvas = document.getElementById("renderCanvas");
 var engine = new BABYLON.Engine(canvas, true);
 
 var PATH_TO_HEIGHTMAP = "perlin_noise.png";
+var PATH_TO_GRASS = "grass.png";
 var MAP_WIDTH = 500;
 var MAP_HEIGHT = 500;
 var MAP_SUBDIVISIONS = 50;
-var MIN_HEIGHT_DISPLACEMENT = 0;
-var MAX_HEIGHT_DISPLACEMENT = 25;
+var MIN_HEIGHT_DISPLACEMENT = -3.25;
+var MAX_HEIGHT_DISPLACEMENT = 10;
 var MAKE_MESH_UPDATABLE = true;
 
 var PLAYER_HEIGHT = 1;
@@ -68,7 +69,9 @@ function addHeightmappedGround(scene) {
     ground.position.y = 0;
 
     var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-    groundMaterial.diffuseTexture = new BABYLON.Texture(PATH_TO_HEIGHTMAP, scene);
+    groundMaterial.diffuseTexture = new BABYLON.Texture(PATH_TO_GRASS, scene);
+    groundMaterial.diffuseTexture.uScale = 200;
+    groundMaterial.diffuseTexture.vScale = 200;
     ground.material = groundMaterial;
     return ground;
 }
@@ -96,16 +99,24 @@ function createSkybox(scene){
 	skybox.material = skyboxMaterial;
 }
 
+function createWater(scene){
+	var water = BABYLON.Mesh.CreateGround("water", 1000, 1000, 1, scene, false);
+	var waterMaterial = new BABYLON.StandardMaterial("waterMaterial", scene);
+    waterMaterial.diffuseTexture = new BABYLON.Texture("skybox/skybox_py.jpg", scene);
+    water.material = waterMaterial;
+}
+
 
 function createScene() {
     var scene = initializeScene();
 
     var camera = addCamera(new BABYLON.Vector3(0, MAX_HEIGHT_DISPLACEMENT + PLAYER_HEIGHT, 0), scene);
 
-    var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
+    var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(5000, 5000, 0), scene);
     light.intensity = .5;
 
     addHeightmappedGround(scene);
+    createWater(scene);
     createSkybox(scene);
 
     return scene;
