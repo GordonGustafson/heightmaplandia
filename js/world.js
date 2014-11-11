@@ -8,15 +8,17 @@ var MAP_SUBDIVISIONS = 50;
 var MIN_HEIGHT_DISPLACEMENT = 0;
 var MAX_HEIGHT_DISPLACEMENT = 25;
 var MAKE_MESH_UPDATABLE = true;
+var BASE_SPEED = 1.1
+var SPRINT_SPEED = 2
+var HIGH_GRAVITY = new BABYLON.Vector3(0, -10, 0);
+var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.3, 0);
 
 var PLAYER_HEIGHT = 1;
 
 function initializeScene() {
     var scene = new BABYLON.Scene(engine);
     // Apply gravity to the scene. Make sure the Y value is less than the camera speed.
-    scene.gravity = new BABYLON.Vector3(0, -0.05, 0);
     scene.collisionsEnabled = true;
-
     return scene;
 }
 
@@ -29,7 +31,7 @@ function addCamera(initialLocation, scene) {
     // attach camera to global canvas and prevent other sources from handling its javascript events
     camera.attachControl(canvas, false);
     // how fast your player can move. Must be greater than downward gravity.
-    camera.speed = .3;
+    camera.speed = BASE_SPEED;
 
     setupAdditionalCameraControls(camera);
 }
@@ -42,22 +44,25 @@ function setupAdditionalCameraControls(camera) {
 
     camera.keysUp.push(LETTER_w_KEYCODE);   // pressing w moves camera forward
     camera.keysDown.push(LETTER_s_KEYCODE); // pressing s moves camera backward
-
-    var rotateCameraLeft  = false;
-    var rotateCameraRight = false;
+    camera.keysLeft.push(LETTER_a_KEYCODE);   // pressing a moves camera left
+    camera.keysRight.push(LETTER_d_KEYCODE); // pressing d moves camera right
+    
+    //Capture mouse pointer:
+    canvas.addEventListener("click", function(evt) {
+        canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
+        if (canvas.requestPointerLock) {
+            canvas.requestPointerLock();
+        }
+    }, false);    
+    
+    //Sprint Functionality
     window.addEventListener("keydown", function(event){
-        if (event.keyCode === LETTER_a_KEYCODE) { rotateCameraLeft  = true; }
-        if (event.keyCode === LETTER_d_KEYCODE) { rotateCameraRight = true; }
+        if (event.keyCode == 16) { scene.activeCamera.speed = SPRINT_SPEED };
+        //if (event.keyCode == 86) {  moveMode = !moveMode };
     });
     window.addEventListener("keyup", function(event){
-        if (event.keyCode === LETTER_a_KEYCODE) { rotateCameraLeft  = false; }
-        if (event.keyCode === LETTER_d_KEYCODE) { rotateCameraRight = false; }
+        if (event.keyCode == 16) {  scene.activeCamera.speed = BASE_SPEED };
     });
-
-    processCameraControlEvents = function() {
-        if (rotateCameraLeft)  { scene.activeCamera.cameraRotation.y -= .0025; }
-        if (rotateCameraRight) { scene.activeCamera.cameraRotation.y += .0025; }
-    };
 }
 
 function addHeightmappedGround(scene) {
@@ -105,12 +110,19 @@ function displayPositionVector() {
     pos.innerHTML = "X: " + cPos.x.toFixed(2) + "<br>Y: " + cPos.y.toFixed(2) + "<br>Z: " + cPos.z.toFixed(2);
 }
 
+function fixGravity(){
+    if (scene.getMeshByName("ground").intersectsPoint(scene.activeCamera.position.subtract(new BABYLON.Vector3(0, 2, 0)))){
+        scene.gravity = NORMAL_GRAVITY;
+    } else {
+        scene.gravity = HIGH_GRAVITY;
+    }
+}
+
 var scene = createScene();
-var processCameraControlEvents;  // event handler variable set in setupAdditionalCameraControls
 
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
-    processCameraControlEvents();
+    fixGravity();
     displayPositionVector();
     scene.render();
 });
