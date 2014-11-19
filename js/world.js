@@ -72,8 +72,28 @@ function addHeightmappedGround(scene) {
     ground.checkCollisions = true;
     ground.position.y = 0;
 
-    var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-    groundMaterial.diffuseTexture = new BABYLON.Texture(PATH_TO_HEIGHTMAP, scene);
+    var groundMaterial =
+        new BABYLON.ShaderMaterial("ground", scene, { vertexElement: "groundVertexShader",
+                                                      fragmentElement: "groundFragmentShader" },
+            {
+                attributes: ["position", "normal", "uv"],
+                uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
+            });
+
+    function addTextureUniformToGround(pathToTexture, glslUniformName) {
+        var texture = new BABYLON.Texture(pathToTexture, scene);
+        texture.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
+        texture.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
+        groundMaterial.setTexture(glslUniformName, texture);
+    }
+
+    addTextureUniformToGround("textures/rock.jpg", "rockSampler");
+    addTextureUniformToGround("textures/grass.jpg", "grassSampler");
+    addTextureUniformToGround("textures/snow.jpg", "snowSampler");
+
+    groundMaterial.setFloat("MIN_TERRAIN_HEIGHT", MIN_HEIGHT_DISPLACEMENT);
+    groundMaterial.setFloat("MAX_TERRAIN_HEIGHT", MAX_HEIGHT_DISPLACEMENT);
+
     ground.material = groundMaterial;
     return ground;
 }
