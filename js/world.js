@@ -22,6 +22,15 @@ function initializeScene() {
     return scene;
 }
 
+function addTree(location,scene) {
+    BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree.babylon", scene, function (meshes) {
+        var tree = meshes[0]
+        tree.position = location;
+        tree.refreshBoundingInfo();
+        tree.checkCollisions = true;
+    });
+}
+
 function addCamera(initialLocation, scene) {
     var camera = new BABYLON.FreeCamera("camera", initialLocation, scene);
     camera.applyGravity = true;
@@ -99,6 +108,8 @@ function createScene() {
     light.intensity = .5;
 
     addHeightmappedGround(scene);
+    
+    addTree(new BABYLON.Vector3(0,4,35),scene);
 
     return scene;
 };

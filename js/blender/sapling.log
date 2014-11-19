@@ -1,0 +1,112 @@
+	Babylon.js Exporter version: 1.1.0, Blender version: 2.70 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	processing begun of material:  sapling.AcornCap
+	processing begun of material:  sapling.AcornCap.001
+	processing begun of material:  sapling.AcornCap.002
+	processing begun of material:  sapling.AcornCap.003
+	processing begun of material:  sapling.AcornCap.004
+	processing begun of material:  sapling.AcornCap.005
+	processing begun of material:  sapling.AcornCap.006
+	processing begun of material:  sapling.AcornSkin
+	processing begun of material:  sapling.AcornSkin.001
+	processing begun of material:  sapling.AcornSkin.002
+	processing begun of material:  sapling.AcornSkin.003
+	processing begun of material:  sapling.AcornSkin.004
+	processing begun of material:  sapling.AcornSkin.005
+	processing begun of material:  sapling.AcornSkin.006
+	processing begun of material:  sapling.Apple1
+	processing begun of material:  sapling.Apple1.001
+	processing begun of material:  sapling.Apple1.002
+	processing begun of material:  sapling.Apple1.003
+	processing begun of material:  sapling.Apple1.004
+	processing begun of material:  sapling.Apple1.005
+	processing begun of material:  sapling.Apple1.006
+	processing begun of material:  sapling.BarkBetter.004
+	processing begun of material:  sapling.BarkBetter.005
+	processing begun of material:  sapling.BarkBetter1.002
+	processing begun of material:  sapling.BarkBetter1.003
+	processing begun of material:  sapling.BarkBetter1.1
+	processing begun of material:  sapling.BarkSimple.001
+	processing begun of material:  sapling.BarkWithSnowAndMoss.006
+	processing begun of material:  sapling.Cherry
+	processing begun of material:  sapling.Cherry.001
+	processing begun of material:  sapling.Cherry.002
+	processing begun of material:  sapling.Cherry.003
+	processing begun of material:  sapling.Cherry.004
+	processing begun of material:  sapling.Cherry.005
+	processing begun of material:  sapling.Cherry.006
+	processing begun of material:  sapling.LeafChestnutSummer
+	processing begun of material:  sapling.LeafChestnutSummer.001
+	processing begun of material:  sapling.LeafChestnutSummer.002
+	processing begun of material:  sapling.LeafChestnutSummer.003
+	processing begun of material:  sapling.LeafChestnutSummer.004
+	processing begun of material:  sapling.LeafChestnutSummer.005
+	processing begun of material:  sapling.LeafChestnutSummer.006
+	processing begun of material:  sapling.LeafOakAutumn
+	processing begun of material:  sapling.LeafOakAutumn.001
+	processing begun of material:  sapling.LeafOakAutumn.002
+	processing begun of material:  sapling.LeafOakAutumn.003
+	processing begun of material:  sapling.LeafOakAutumn.004
+	processing begun of material:  sapling.LeafOakAutumn.005
+	processing begun of material:  sapling.LeafOakAutumn.006
+	processing begun of material:  sapling.LeafOakSpring
+	processing begun of material:  sapling.LeafOakSpring.001
+	processing begun of material:  sapling.LeafOakSpring.002
+	processing begun of material:  sapling.LeafOakSpring.003
+	processing begun of material:  sapling.LeafOakSpring.004
+	processing begun of material:  sapling.LeafOakSpring.005
+	processing begun of material:  sapling.LeafOakSpring.006
+	processing begun of material:  sapling.LeafOakSummer
+	processing begun of material:  sapling.LeafOakSummer.001
+	processing begun of material:  sapling.LeafOakSummer.002
+	processing begun of material:  sapling.LeafOakSummer.003
+	processing begun of material:  sapling.LeafOakSummer.004
+	processing begun of material:  sapling.LeafOakSummer.005
+	processing begun of material:  sapling.LeafOakSummer.006
+	processing begun of material:  sapling.mistletoe
+	processing begun of material:  sapling.mistletoe.001
+	processing begun of material:  sapling.mistletoe.002
+	processing begun of material:  sapling.mistletoe.003
+	processing begun of material:  sapling.mistletoe.004
+	processing begun of material:  sapling.mistletoe.005
+	processing begun of material:  sapling.mistletoe.006
+	processing begun of material:  sapling.nest
+	processing begun of material:  sapling.nest.001
+	processing begun of material:  sapling.nest.002
+	processing begun of material:  sapling.nest.003
+	processing begun of material:  sapling.nest.004
+	processing begun of material:  sapling.nest.005
+	processing begun of material:  sapling.nest.006
+	processing begun of material:  sapling.Peach
+	processing begun of material:  sapling.Peach.001
+	processing begun of material:  sapling.Peach.002
+	processing begun of material:  sapling.Peach.003
+	processing begun of material:  sapling.Peach.004
+	processing begun of material:  sapling.Peach.005
+	processing begun of material:  sapling.Peach.006
+	processing begun of material:  sapling.Pear
+	processing begun of material:  sapling.Pear.001
+	processing begun of material:  sapling.Pear.002
+	processing begun of material:  sapling.Pear.003
+	processing begun of material:  sapling.Pear.004
+	processing begun of material:  sapling.Pear.005
+	processing begun of material:  sapling.Pear.006
+	processing begun of material:  sapling.Plum
+	processing begun of material:  sapling.Plum.001
+	processing begun of material:  sapling.Plum.002
+	processing begun of material:  sapling.Plum.003
+	processing begun of material:  sapling.Plum.004
+	processing begun of material:  sapling.Plum.005
+	processing begun of material:  sapling.Plum.006
+	processing begun of mesh:  Tree.001
+		num positions      :  255
+		num normals        :  255
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  1512
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
