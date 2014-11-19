@@ -9,10 +9,10 @@ var MAP_SUBDIVISIONS = 50;
 var MIN_HEIGHT_DISPLACEMENT = 0;
 var MAX_HEIGHT_DISPLACEMENT = 25;
 var MAKE_MESH_UPDATABLE = true;
-var BASE_SPEED = 1.1
-var SPRINT_SPEED = 2
+var BASE_SPEED = .6
+var SPRINT_SPEED = 1.2
 var HIGH_GRAVITY = new BABYLON.Vector3(0, -10, 0);
-var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.3, 0);
+var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.05, 0);
 
 var PLAYER_HEIGHT = 1;
 
@@ -26,7 +26,7 @@ function initializeScene() {
 function addTree(x,z,scene) {
     BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree.babylon", scene, function (meshes) {
         var tree = meshes[0]
-        tree.position = new BABYLON.Vector3(x,getGroundHeight(x,z),z);
+        tree.position = new BABYLON.Vector3(x,(getGroundHeight(x,z)-1),z);
         tree.refreshBoundingInfo();
         tree.checkCollisions = true;
     });
