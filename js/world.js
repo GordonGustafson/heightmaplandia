@@ -1,5 +1,6 @@
 var canvas = document.getElementById("renderCanvas");
 var engine = new BABYLON.Engine(canvas, true);
+var ground;
 
 var PATH_TO_HEIGHTMAP = "perlin_noise.png";
 var MAP_WIDTH = 500;
@@ -22,13 +23,19 @@ function initializeScene() {
     return scene;
 }
 
-function addTree(location,scene) {
+function addTree(x,z,scene) {
     BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree.babylon", scene, function (meshes) {
         var tree = meshes[0]
-        tree.position = location;
+        tree.position = new BABYLON.Vector3(x,getGroundHeight(x,z),z);
         tree.refreshBoundingInfo();
         tree.checkCollisions = true;
     });
+}
+
+function getGroundHeight(x,z){
+	var downRay = new BABYLON.Ray(new BABYLON.Vector3(x,100,z), new BABYLON.Vector3(0,-1,0));
+	var info = ground.intersects(downRay,false);
+	return info.pickedPoint.y;
 }
 
 function addCamera(initialLocation, scene) {
@@ -75,7 +82,7 @@ function setupAdditionalCameraControls(camera) {
 }
 
 function addHeightmappedGround(scene) {
-    var ground = BABYLON.Mesh.CreateGroundFromHeightMap(
+    ground = BABYLON.Mesh.CreateGroundFromHeightMap(
         "ground", PATH_TO_HEIGHTMAP, MAP_WIDTH, MAP_HEIGHT, MAP_SUBDIVISIONS,
         MIN_HEIGHT_DISPLACEMENT, MAX_HEIGHT_DISPLACEMENT, scene, MAKE_MESH_UPDATABLE);
     ground.checkCollisions = true;
@@ -129,7 +136,7 @@ function createScene() {
 
     addHeightmappedGround(scene);
     
-    addTree(new BABYLON.Vector3(0,4,35),scene);
+    addTree(0,15,scene);
 
     return scene;
 };
