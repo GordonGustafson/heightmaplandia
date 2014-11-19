@@ -1,13 +1,13 @@
 var canvas = document.getElementById("renderCanvas");
 var engine = new BABYLON.Engine(canvas, true);
 
-var PATH_TO_HEIGHTMAP = "perlin_noise.png";
+var PATH_TO_HEIGHTMAP = "3.jpg";
 var PATH_TO_GRASS = "grass.png";
-var MAP_WIDTH = 500;
-var MAP_HEIGHT = 500;
-var MAP_SUBDIVISIONS = 50;
-var MIN_HEIGHT_DISPLACEMENT = -3.25;
-var MAX_HEIGHT_DISPLACEMENT = 10;
+var MAP_WIDTH = 2048;
+var MAP_HEIGHT = 2048;
+var MAP_SUBDIVISIONS = 128;
+var MIN_HEIGHT_DISPLACEMENT = -25;
+var MAX_HEIGHT_DISPLACEMENT = 60;
 var MAKE_MESH_UPDATABLE = true;
 
 var PLAYER_HEIGHT = 1;
@@ -72,6 +72,10 @@ function addHeightmappedGround(scene) {
     groundMaterial.diffuseTexture = new BABYLON.Texture(PATH_TO_GRASS, scene);
     groundMaterial.diffuseTexture.uScale = 200;
     groundMaterial.diffuseTexture.vScale = 200;
+    groundMaterial.ambientTexture = new BABYLON.Texture(PATH_TO_HEIGHTMAP, scene);
+
+    groundMaterial.specularColor = new BABYLON.Color3(0,0,0);
+
     ground.material = groundMaterial;
     return ground;
 }
@@ -88,21 +92,24 @@ function addSphereAtLocation(initialLocation, scene) {
 }
 
 function createSkybox(scene){
-	// Skybox
-	var skybox = BABYLON.Mesh.CreateBox("skyBox", 10000.0, scene);
-	var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
-	skyboxMaterial.backFaceCulling = false;
-	skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("skybox/skybox", scene);
-	skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-	skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-	skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-	skybox.material = skyboxMaterial;
+    // Skybox
+    var skybox = BABYLON.Mesh.CreateBox("skyBox", 10000.0, scene);
+    var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+    skyboxMaterial.backFaceCulling = false;
+    skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("skybox/skybox", scene);
+    skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+    skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+    skybox.material = skyboxMaterial;
 }
 
 function createWater(scene){
-	var water = BABYLON.Mesh.CreateGround("water", 1000, 1000, 1, scene, false);
-	var waterMaterial = new BABYLON.StandardMaterial("waterMaterial", scene);
-    waterMaterial.diffuseTexture = new BABYLON.Texture("skybox/skybox_py.jpg", scene);
+    var water = BABYLON.Mesh.CreateGround("water", 1000, 1000, 1, scene, false);
+    var waterMaterial = new BABYLON.StandardMaterial("waterMaterial", scene);
+    waterMaterial.backFaceCulling = false;
+    //waterMaterial.diffuseTexture = new BABYLON.Texture("skybox/skybox_py.jpg", scene);
+    waterMaterial.diffuseColor = new BABYLON.Color3(0, 0, .8,.5);
+    skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
     water.material = waterMaterial;
 }
 
