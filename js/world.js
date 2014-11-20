@@ -1,6 +1,7 @@
 var canvas = document.getElementById("renderCanvas");
 var engine = new BABYLON.Engine(canvas, true);
 var ground;
+var water;
 
 var PATH_TO_HEIGHTMAP = "3.jpg";
 var PATH_TO_GRASS = "grass.png";
@@ -10,11 +11,10 @@ var MAP_SUBDIVISIONS = 128;
 var MIN_HEIGHT_DISPLACEMENT = -25;
 var MAX_HEIGHT_DISPLACEMENT = 60;
 var MAKE_MESH_UPDATABLE = true;
-var BASE_SPEED = .6
-var SPRINT_SPEED = 1.2
-var HIGH_GRAVITY = new BABYLON.Vector3(0, -10, 0);
-var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.05, 0);
-
+var BASE_SPEED = .5
+var SPRINT_SPEED = 3
+var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.06, 0);
+var TREES;
 var PLAYER_HEIGHT = 1;
 
 function initializeScene() {
@@ -24,16 +24,74 @@ function initializeScene() {
     return scene;
 }
 
-function addTree(x,z,scene) {
-    BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree.babylon", scene, function (meshes) {
-        var tree = meshes[0]
-        tree.position = new BABYLON.Vector3(x,(getGroundHeight(x,z)-1),z);
-        tree.refreshBoundingInfo();
-        tree.checkCollisions = true;
-    });
+function addTree(x,y,z,scene,tree) {
+    tree.position = new BABYLON.Vector3(x,y-1,z);
+    tree.refreshBoundingInfo();
+    tree.checkCollisions = true;
+}
+
+function buildTrees(scene){   
+   
+     // Returns a random integer between min (inclusive) and max (inclusive)
+     // Using Math.round() will give you a non-uniform distribution!
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    } 
+    var mat = new BABYLON.StandardMaterial("material",scene);
+    mat.ambientTexture = new BABYLON.Texture("/ia/tree.jpg",scene);   
+    var trees = [];
+    BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree1.babylon", scene, function (tree1) {
+        trees[0]=tree1[0];
+        BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree2.babylon", scene, function (tree2) {
+            trees[1]=tree2[0];
+            BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree3.babylon", scene, function (tree3) {
+                trees[2]=tree3[0];
+                BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree4.babylon", scene, function (tree4) {
+                    trees[3]=tree4[0];
+                    BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree5.babylon", scene, function (tree5) {
+                        trees[4]=tree5[0];
+                        BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree6.babylon", scene, function (tree6) {
+                            trees[5]=tree6[0];
+                            BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree7.babylon", scene, function (tree7) {
+                                trees[6]=tree7[0];
+                                BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree8.babylon", scene, function (tree8) {
+                                    trees[7]=tree8[0];
+                                    BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree9.babylon", scene, function (tree9) {
+                                        trees[8]=tree9[0];
+                                        BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree10.babylon", scene, function (tree10) {
+                                            trees[9]=tree10[0];
+                                            for (var z = (-MAP_HEIGHT/2) + 26; z < MAP_HEIGHT/2 - 26; z += 50) {
+                                                 for (var x = (-MAP_WIDTH/2) + 26; x < MAP_WIDTH/2 -26; x += 50) {
+                                                    var i = getRandomInt(-20,20);
+                                                    var j = getRandomInt(-20,20);
+                                                    var y = getGroundHeight(x+i,z+j);
+                                                    var t = getRandomInt(0,9);
+                                                    var tree = trees[t];
+                                                    tree.material = mat;
+                                                    if (y > 1) { addTree(x+i,y,z+j,scene,tree.clone()); }
+                                                }   
+                                            }
+                                            for (var k = 0; k < 10; k++){
+                                                trees[k].dispose();
+                                            }
+                                            document.getElementById("loadingcontent").innerHTML = "Click Anywhere to Begin";
+                                            document.getElementById("loading").addEventListener("click", function(evt) {
+                                                document.getElementById("loading").style.display = "none";
+                                            }, false);   
+                                       });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });       
 }
 
 function getGroundHeight(x,z){
+    ground.refreshBoundingInfo();
 	var downRay = new BABYLON.Ray(new BABYLON.Vector3(x,100,z), new BABYLON.Vector3(0,-1,0));
 	var info = ground.intersects(downRay,false);
 	return info.pickedPoint.y;
@@ -141,7 +199,7 @@ function createSkybox(scene){
 }
 
 function createWater(scene){
-    var water = BABYLON.Mesh.CreateGround("water", 1000, 1000, 1, scene, false);
+    water = BABYLON.Mesh.CreateGround("water", 1000, 1000, 1, scene, false);
     var waterMaterial = new BABYLON.StandardMaterial("waterMaterial", scene);
     waterMaterial.backFaceCulling = false;
     waterMaterial.diffuseTexture = new BABYLON.Texture("skybox/skybox_py.jpg", scene);
@@ -156,12 +214,9 @@ function createScene() {
 
     var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(5000, 5000, 0), scene);
     light.intensity = .5;
-
     addHeightmappedGround(scene);
     createWater(scene);
     createSkybox(scene);
-    addTree(0,15,scene);
-
     return scene;
 };
 
@@ -173,20 +228,25 @@ function displayPositionVector() {
 }
 
 function fixGravity(){
-    if (scene.getMeshByName("ground").intersectsPoint(scene.activeCamera.position.subtract(new BABYLON.Vector3(0, 2, 0)))){
-        scene.gravity = NORMAL_GRAVITY;
+    var p = scene.activeCamera.position;
+    if (Math.abs((p.y - getGroundHeight(p.x,p.z))) > 3){
+        scene.activeCamera.position.y -= 0.02;
     } else {
-        scene.gravity = HIGH_GRAVITY;
+        scene.gravity = NORMAL_GRAVITY;
     }
 }
 
 var scene = createScene();
-
+var initialized = false;
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
-    fixGravity();
+    if(!initialized && scene.isReady()){
+        buildTrees(scene);
+        initialized = true;
+    }
+    scene.render();   
+    if(initialized){fixGravity();}
     displayPositionVector();
-    scene.render();
 });
 
 // Watch for browser/canvas resize events
