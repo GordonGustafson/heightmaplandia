@@ -113,6 +113,7 @@ function addHeightmappedGround(scene) {
 
 
     ground.material = groundMaterial;
+    ground.refreshBoundingInfo();
     return ground;
 }
 
