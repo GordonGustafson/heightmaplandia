@@ -16,6 +16,16 @@ var SPRINT_SPEED = 3
 var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.06, 0);
 var TREES;
 var PLAYER_HEIGHT = 1;
+                           
+var audio  = document.createElement('audio'); 
+//Song source: http://freemusicarchive.org/genre/Instrumental/
+//Artist: Kevin MacLeod
+//Song Name: "Nothing Broken"
+audio.src = "song.mp3"
+audio.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+}, false);
 
 function initializeScene() {
     var scene = new BABYLON.Scene(engine);
@@ -74,6 +84,7 @@ function buildTrees(scene){
                                             for (var k = 0; k < 10; k++){
                                                 trees[k].dispose();
                                             }
+                                            audio.play();
                                             document.getElementById("loadingcontent").innerHTML = "Click Anywhere to Begin";
                                             document.getElementById("loading").addEventListener("click", function(evt) {
                                                 document.getElementById("loading").style.display = "none";
@@ -199,7 +210,7 @@ function createSkybox(scene){
 }
 
 function createWater(scene){
-    water = BABYLON.Mesh.CreateGround("water", 1000, 1000, 1, scene, false);
+    water = BABYLON.Mesh.CreateGround("water", MAP_WIDTH, MAP_HEIGHT, 1, scene, false);
     var waterMaterial = new BABYLON.StandardMaterial("waterMaterial", scene);
     waterMaterial.backFaceCulling = false;
     waterMaterial.diffuseTexture = new BABYLON.Texture("skybox/skybox_py.jpg", scene);
