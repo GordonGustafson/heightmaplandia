@@ -1,5 +1,6 @@
 var canvas = document.getElementById("renderCanvas");
 var engine = new BABYLON.Engine(canvas, true);
+var scene;
 var ground;
 var water;
 
@@ -28,13 +29,13 @@ function initializeScene() {
     return scene;
 }
 
-function addTree(x,y,z,scene,tree) {
+function addTree(x,y,z,tree) {
     tree.position = new BABYLON.Vector3(x,y-1,z);
     tree.refreshBoundingInfo();
     tree.checkCollisions = true;
 }
 
-function buildTrees(scene){
+function buildTrees(){
 
      // Returns a random integer between min (inclusive) and max (inclusive)
      // Using Math.round() will give you a non-uniform distribution!
@@ -72,7 +73,7 @@ function buildTrees(scene){
                                                     var t = getRandomInt(0,9);
                                                     var tree = trees[t];
                                                     tree.material = mat;
-                                                    if (y > 1) { addTree(x+i,y,z+j,scene,tree.clone()); }
+                                                    if (y > 1) { addTree(x+i,y,z+j,tree.clone()); }
                                                 }
                                             }
                                             for (var k = 0; k < 10; k++){
@@ -102,7 +103,7 @@ function getGroundHeight(x,z){
 	return info.pickedPoint.y;
 }
 
-function addCamera(initialLocation, scene) {
+function addCamera(initialLocation) {
     var camera = new BABYLON.FreeCamera("camera", initialLocation, scene);
     camera.applyGravity = true;
     camera.checkCollisions = true;
@@ -144,7 +145,7 @@ function setupAdditionalCameraControls(camera) {
     });
 }
 
-function addHeightmappedGround(scene) {
+function addHeightmappedGround() {
     ground = BABYLON.Mesh.CreateGroundFromHeightMap(
         "ground", PATH_TO_HEIGHTMAP, MAP_WIDTH, MAP_HEIGHT, MAP_SUBDIVISIONS,
         MIN_HEIGHT_DISPLACEMENT, MAX_HEIGHT_DISPLACEMENT, scene, MAKE_MESH_UPDATABLE);
@@ -179,7 +180,7 @@ function addHeightmappedGround(scene) {
     return ground;
 }
 
-function createSkybox(scene){
+function createSkybox(){
     var skybox = BABYLON.Mesh.CreateBox("skyBox", 10000.0, scene);
     var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
     skyboxMaterial.backFaceCulling = false;
@@ -190,7 +191,7 @@ function createSkybox(scene){
     skybox.material = skyboxMaterial;
 }
 
-function createWater(scene){
+function createWater(){
     water = BABYLON.Mesh.CreateGround("water", MAP_WIDTH, MAP_HEIGHT, 1, scene, false);
     var waterMaterial = new BABYLON.StandardMaterial("waterMaterial", scene);
     waterMaterial.backFaceCulling = false;
@@ -200,16 +201,15 @@ function createWater(scene){
 
 
 function createScene() {
-    var scene = initializeScene();
+    scene = initializeScene();
 
-    var camera = addCamera(new BABYLON.Vector3(0, MAX_HEIGHT_DISPLACEMENT + PLAYER_HEIGHT, 0), scene);
+    addCamera(new BABYLON.Vector3(0, MAX_HEIGHT_DISPLACEMENT + PLAYER_HEIGHT, 0));
 
     var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(5000, 5000, 0), scene);
     light.intensity = .5;
-    addHeightmappedGround(scene);
-    createWater(scene);
-    createSkybox(scene);
-    return scene;
+    addHeightmappedGround();
+    createWater();
+    createSkybox();
 };
 
 
@@ -229,7 +229,8 @@ function fixGravity(){
     }
 }
 
-var scene = createScene();
+createScene();
+
 var initialized = false;
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
