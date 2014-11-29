@@ -3,7 +3,7 @@ var engine = new BABYLON.Engine(canvas, true);
 var ground;
 var water;
 
-var PATH_TO_HEIGHTMAP = "3.jpg";
+var PATH_TO_HEIGHTMAP = "heightmaps/3.jpg";
 var MAP_WIDTH = 2048;
 var MAP_HEIGHT = 2048;
 var MAP_SUBDIVISIONS = 128;
@@ -16,7 +16,7 @@ var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.06, 0);
 var PLAYER_HEIGHT = 1;
 
 var audio  = document.createElement('audio');
-audio.src = "song.mp3"
+audio.src = "audio/song.mp3"
 audio.addEventListener('ended', function() {
     this.currentTime = 0;
     this.play();
@@ -44,25 +44,25 @@ function buildTrees(scene){
     var mat = new BABYLON.StandardMaterial("material",scene);
     mat.ambientTexture = new BABYLON.Texture("/ia/tree.jpg",scene);
     var trees = [];
-    BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree1.babylon", scene, function (tree1) {
+    BABYLON.SceneLoader.ImportMesh("", "blender/", "tree1.babylon", scene, function (tree1) {
         trees[0]=tree1[0];
-        BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree2.babylon", scene, function (tree2) {
+        BABYLON.SceneLoader.ImportMesh("", "blender/", "tree2.babylon", scene, function (tree2) {
             trees[1]=tree2[0];
-            BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree3.babylon", scene, function (tree3) {
+            BABYLON.SceneLoader.ImportMesh("", "blender/", "tree3.babylon", scene, function (tree3) {
                 trees[2]=tree3[0];
-                BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree4.babylon", scene, function (tree4) {
+                BABYLON.SceneLoader.ImportMesh("", "blender/", "tree4.babylon", scene, function (tree4) {
                     trees[3]=tree4[0];
-                    BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree5.babylon", scene, function (tree5) {
+                    BABYLON.SceneLoader.ImportMesh("", "blender/", "tree5.babylon", scene, function (tree5) {
                         trees[4]=tree5[0];
-                        BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree6.babylon", scene, function (tree6) {
+                        BABYLON.SceneLoader.ImportMesh("", "blender/", "tree6.babylon", scene, function (tree6) {
                             trees[5]=tree6[0];
-                            BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree7.babylon", scene, function (tree7) {
+                            BABYLON.SceneLoader.ImportMesh("", "blender/", "tree7.babylon", scene, function (tree7) {
                                 trees[6]=tree7[0];
-                                BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree8.babylon", scene, function (tree8) {
+                                BABYLON.SceneLoader.ImportMesh("", "blender/", "tree8.babylon", scene, function (tree8) {
                                     trees[7]=tree8[0];
-                                    BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree9.babylon", scene, function (tree9) {
+                                    BABYLON.SceneLoader.ImportMesh("", "blender/", "tree9.babylon", scene, function (tree9) {
                                         trees[8]=tree9[0];
-                                        BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree10.babylon", scene, function (tree10) {
+                                        BABYLON.SceneLoader.ImportMesh("", "blender/", "tree10.babylon", scene, function (tree10) {
                                             trees[9]=tree10[0];
                                             for (var z = (-MAP_HEIGHT/2) + 26; z < MAP_HEIGHT/2 - 26; z += 50) {
                                                  for (var x = (-MAP_WIDTH/2) + 26; x < MAP_WIDTH/2 -26; x += 50) {
