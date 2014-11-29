@@ -214,9 +214,10 @@ function createScene() {
 
 
 function displayPositionVector() {
-    var pos = document.getElementById("pos");
-    cPos = scene.activeCamera.position;
-    pos.innerHTML = "X: " + cPos.x.toFixed(2) + "<br>Y: " + cPos.y.toFixed(2) + "<br>Z: " + cPos.z.toFixed(2);
+    cameraPosition = scene.activeCamera.position;
+    document.getElementById("positionX").innerHTML = cameraPosition.x.toFixed(2);
+    document.getElementById("positionY").innerHTML = cameraPosition.y.toFixed(2);
+    document.getElementById("positionZ").innerHTML = cameraPosition.z.toFixed(2);
 }
 
 function fixGravity(){
