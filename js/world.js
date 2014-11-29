@@ -179,17 +179,6 @@ function addHeightmappedGround(scene) {
     return ground;
 }
 
-function addSphereAtLocation(initialLocation, scene) {
-    var NUMBER_OF_SUBDIVISIONS = 16;
-    var RADIUS = 2;
-    // The main purpose of mesh names is to retrieve them with scene.getMeshByName("sphere").
-    // Since we don't plan on using it at the moment, all the spheres can have the same name.
-    var sphere = BABYLON.Mesh.CreateSphere("sphere", NUMBER_OF_SUBDIVISIONS, RADIUS, scene);
-    sphere.position = initialLocation;
-    sphere.applyGravity = true;
-    sphere.checkCollisions = true;
-}
-
 function createSkybox(scene){
     var skybox = BABYLON.Mesh.CreateBox("skyBox", 10000.0, scene);
     var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
