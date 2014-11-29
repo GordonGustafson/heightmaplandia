@@ -14,13 +14,9 @@ var MAKE_MESH_UPDATABLE = true;
 var BASE_SPEED = .5
 var SPRINT_SPEED = 3
 var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.06, 0);
-var TREES;
 var PLAYER_HEIGHT = 1;
-                           
-var audio  = document.createElement('audio'); 
-//Song source: http://freemusicarchive.org/genre/Instrumental/
-//Artist: Kevin MacLeod
-//Song Name: "Nothing Broken"
+
+var audio  = document.createElement('audio');
 audio.src = "song.mp3"
 audio.addEventListener('ended', function() {
     this.currentTime = 0;
@@ -29,7 +25,6 @@ audio.addEventListener('ended', function() {
 
 function initializeScene() {
     var scene = new BABYLON.Scene(engine);
-    // Apply gravity to the scene. Make sure the Y value is less than the camera speed.
     scene.collisionsEnabled = true;
     return scene;
 }
@@ -40,15 +35,15 @@ function addTree(x,y,z,scene,tree) {
     tree.checkCollisions = true;
 }
 
-function buildTrees(scene){   
-   
+function buildTrees(scene){
+
      // Returns a random integer between min (inclusive) and max (inclusive)
      // Using Math.round() will give you a non-uniform distribution!
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
-    } 
+    }
     var mat = new BABYLON.StandardMaterial("material",scene);
-    mat.ambientTexture = new BABYLON.Texture("/ia/tree.jpg",scene);   
+    mat.ambientTexture = new BABYLON.Texture("/ia/tree.jpg",scene);
     var trees = [];
     BABYLON.SceneLoader.ImportMesh("", "js/blender/", "tree1.babylon", scene, function (tree1) {
         trees[0]=tree1[0];
@@ -79,7 +74,7 @@ function buildTrees(scene){
                                                     var tree = trees[t];
                                                     tree.material = mat;
                                                     if (y > 1) { addTree(x+i,y,z+j,scene,tree.clone()); }
-                                                }   
+                                                }
                                             }
                                             for (var k = 0; k < 10; k++){
                                                 trees[k].dispose();
@@ -88,7 +83,7 @@ function buildTrees(scene){
                                             document.getElementById("loadingcontent").innerHTML = "Click Anywhere to Begin";
                                             document.getElementById("loading").addEventListener("click", function(evt) {
                                                 document.getElementById("loading").style.display = "none";
-                                            }, false);   
+                                            }, false);
                                        });
                                     });
                                 });
@@ -98,7 +93,7 @@ function buildTrees(scene){
                 });
             });
         });
-    });       
+    });
 }
 
 function getGroundHeight(x,z){
@@ -116,7 +111,7 @@ function addCamera(initialLocation, scene) {
     camera.ellipsoid = new BABYLON.Vector3(1, PLAYER_HEIGHT, 1);
     // attach camera to global canvas and prevent other sources from handling its javascript events
     camera.attachControl(canvas, false);
-    // how fast your player can move. Must be greater than downward gravity.
+    // how fast your player can move when not sprinting. Must be greater than downward gravity.
     camera.speed = BASE_SPEED;
 
     setupAdditionalCameraControls(camera);
@@ -128,23 +123,22 @@ function setupAdditionalCameraControls(camera) {
     var LETTER_w_KEYCODE = 87;
     var LETTER_s_KEYCODE = 83;
 
-    camera.keysUp.push(LETTER_w_KEYCODE);   // pressing w moves camera forward
-    camera.keysDown.push(LETTER_s_KEYCODE); // pressing s moves camera backward
-    camera.keysLeft.push(LETTER_a_KEYCODE);   // pressing a moves camera left
-    camera.keysRight.push(LETTER_d_KEYCODE); // pressing d moves camera right
-    
+    camera.keysUp.push(LETTER_w_KEYCODE);    // w moves forward
+    camera.keysDown.push(LETTER_s_KEYCODE);  // s moves backward
+    camera.keysLeft.push(LETTER_a_KEYCODE);  // a moves left
+    camera.keysRight.push(LETTER_d_KEYCODE); // d moves right
+
     //Capture mouse pointer:
     canvas.addEventListener("click", function(evt) {
         canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
         if (canvas.requestPointerLock) {
             canvas.requestPointerLock();
         }
-    }, false);    
-    
+    }, false);
+
     //Sprint Functionality
     window.addEventListener("keydown", function(event){
         if (event.keyCode == 16) { scene.activeCamera.speed = SPRINT_SPEED };
-        //if (event.keyCode == 86) {  moveMode = !moveMode };
     });
     window.addEventListener("keyup", function(event){
         if (event.keyCode == 16) {  scene.activeCamera.speed = BASE_SPEED };
@@ -198,7 +192,6 @@ function addSphereAtLocation(initialLocation, scene) {
 }
 
 function createSkybox(scene){
-    // Skybox
     var skybox = BABYLON.Mesh.CreateBox("skyBox", 10000.0, scene);
     var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
     skyboxMaterial.backFaceCulling = false;
@@ -255,7 +248,7 @@ engine.runRenderLoop(function () {
         buildTrees(scene);
         initialized = true;
     }
-    scene.render();   
+    scene.render();
     if(initialized){fixGravity();}
     displayPositionVector();
 });
