@@ -4,7 +4,6 @@ var ground;
 var water;
 
 var PATH_TO_HEIGHTMAP = "3.jpg";
-var PATH_TO_GRASS = "grass.png";
 var MAP_WIDTH = 2048;
 var MAP_HEIGHT = 2048;
 var MAP_SUBDIVISIONS = 128;
