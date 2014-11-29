@@ -43,7 +43,7 @@ function buildTrees(){
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
     var mat = new BABYLON.StandardMaterial("material",scene);
-    mat.ambientTexture = new BABYLON.Texture("/ia/tree.jpg",scene);
+    mat.ambientTexture = new BABYLON.Texture("textures/tree.jpg",scene);
     var trees = [];
     BABYLON.SceneLoader.ImportMesh("", "blender/", "tree1.babylon", scene, function (tree1) {
         trees[0]=tree1[0];
