@@ -10,6 +10,7 @@ var MAP_HEIGHT = 2048;          // corresponds to z coordinate of map
 var MAP_SUBDIVISIONS = 128;
 var MIN_HEIGHT_DISPLACEMENT = -25;
 var MAX_HEIGHT_DISPLACEMENT = 60;
+var MIN_SPAWN_ALTITUDE = 30;
 var MAKE_MESH_UPDATABLE = true;
 var BASE_SPEED = .5
 var SPRINT_SPEED = 3
@@ -48,6 +49,14 @@ function getRandomPositionOnGround() {
     return new BABYLON.Vector3(x, getGroundHeight(x, z), z);
 }
 
+function getRandomPositionAbove(minimumAltitude) {
+    var randomPosition = getRandomPositionOnGround();
+    while (randomPosition.y < minimumAltitude) {
+        randomPosition = getRandomPositionOnGround();
+    }
+    return randomPosition;
+}
+
 function startLoadingTrees(){
     var treeMaterial = new BABYLON.StandardMaterial("material",scene);
     treeMaterial.ambientTexture = new BABYLON.Texture("textures/tree.jpg",scene);
@@ -67,7 +76,9 @@ function startLoadingTrees(){
                     treeToPlace.checkCollisions = true;
                     treeToPlace.material = treeMaterial;
                 } else {
-                    // skip any trees we would've placed below the water level
+                    // Skip any trees we would've placed below the water level.
+                    // This approximates a constant density of trees rather than
+                    // a constant number of them.
                 }
             }
             tree.dispose();  // dispose original trees so they aren't rendered at origin
@@ -78,10 +89,16 @@ function startLoadingTrees(){
     }
 }
 
-function addCamera(initialLocation) {
-    var camera = new BABYLON.FreeCamera("camera", initialLocation, scene);
+function addCameraAtRandomPosition() {
+    // I don't know the math behind why this is 2 * PLAYER_HEIGHT, but
+    // using PLAYER_HEIGHT will spawn you 'waist-deep' in the ground.
+    var playerHeightVector =  new BABYLON.Vector3(0, 2 * PLAYER_HEIGHT, 0);
+    var initialPosition = getRandomPositionAbove(MIN_SPAWN_ALTITUDE).add(playerHeightVector);
+    var camera = new BABYLON.FreeCamera("camera", initialPosition, scene);
     camera.applyGravity = true;
     camera.checkCollisions = true;
+    // point the camera toward the origin looking level with the horizon
+    camera.setTarget(new BABYLON.Vector3(0, initialPosition.y, 0));
     // ellipsoid around camera that determines player collisions
     camera.ellipsoid = new BABYLON.Vector3(1, PLAYER_HEIGHT, 1);
     // attach camera to global canvas and prevent other sources from handling its javascript events
@@ -184,10 +201,15 @@ function playAudio() {
     audio.play();
 }
 
+function startRenderLoop() {
+    engine.runRenderLoop(function () {
+        scene.render();
+        displayPositionVector();
+    });
+}
+
 function createScene() {
     scene = initializeScene();
-
-    addCamera(new BABYLON.Vector3(0, MAX_HEIGHT_DISPLACEMENT + PLAYER_HEIGHT, 0));
 
     var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(5000, 5000, 0), scene);
     light.intensity = .5;
@@ -196,6 +218,8 @@ function createScene() {
     createWater();
     playAudio();
 
+    scene.gravity = NORMAL_GRAVITY;
+
     var displayReadyToBegin = function() {
         document.getElementById("loadingcontent").innerHTML = "Click Anywhere to Begin";
         document.getElementById("loading").addEventListener("click", function(evt) {
@@ -203,8 +227,10 @@ function createScene() {
         }, false);
     }
 
+    scene.executeWhenReady(addCameraAtRandomPosition);
     scene.executeWhenReady(startLoadingTrees);
     scene.executeWhenReady(displayReadyToBegin);
+    scene.executeWhenReady(startRenderLoop);
 }
 
 
@@ -225,17 +251,6 @@ function fixGravity(){
 }
 
 createScene();
-
-var initialized = false;
-// Register a render loop to repeatedly render the scene
-engine.runRenderLoop(function () {
-    if(!initialized && scene.isReady()){
-        initialized = true;
-    }
-    scene.render();
-    if(initialized){fixGravity();}
-    displayPositionVector();
-});
 
 // Watch for browser/canvas resize events
 window.addEventListener("resize", function () {
