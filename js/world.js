@@ -96,11 +96,11 @@ function buildTrees(){
     });
 }
 
-function getGroundHeight(x,z){
-    ground.refreshBoundingInfo();
-	var downRay = new BABYLON.Ray(new BABYLON.Vector3(x,100,z), new BABYLON.Vector3(0,-1,0));
-	var info = ground.intersects(downRay,false);
-	return info.pickedPoint.y;
+function getGroundHeight(x, z){
+    var downRay = new BABYLON.Ray(new BABYLON.Vector3(x, MAX_HEIGHT_DISPLACEMENT + 1, z),
+                                  new BABYLON.Vector3(0, -1, 0));
+    var info = ground.intersects(downRay, false);
+    return info.pickedPoint.y;
 }
 
 function addCamera(initialLocation) {
