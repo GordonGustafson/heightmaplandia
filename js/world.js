@@ -5,23 +5,18 @@ var ground;
 var water;
 
 var PATH_TO_HEIGHTMAP = "heightmaps/3.jpg";
-var MAP_WIDTH = 2048;
-var MAP_HEIGHT = 2048;
+var MAP_WIDTH = 2048;           // corresponds to x coordinate of map
+var MAP_HEIGHT = 2048;          // corresponds to z coordinate of map
 var MAP_SUBDIVISIONS = 128;
 var MIN_HEIGHT_DISPLACEMENT = -25;
 var MAX_HEIGHT_DISPLACEMENT = 60;
+var MIN_SPAWN_ALTITUDE = 30;
 var MAKE_MESH_UPDATABLE = true;
 var BASE_SPEED = .5
 var SPRINT_SPEED = 3
 var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.06, 0);
 var PLAYER_HEIGHT = 1;
-
-var audio  = document.createElement('audio');
-audio.src = "audio/song.mp3"
-audio.addEventListener('ended', function() {
-    this.currentTime = 0;
-    this.play();
-}, false);
+var WATER_LEVEL = 1;
 
 function initializeScene() {
     var scene = new BABYLON.Scene(engine);
@@ -29,84 +24,81 @@ function initializeScene() {
     return scene;
 }
 
-function addTree(x,y,z,tree) {
-    tree.position = new BABYLON.Vector3(x,y-1,z);
-    tree.refreshBoundingInfo();
-    tree.checkCollisions = true;
+function getGroundHeight(x, z){
+    var downRay = new BABYLON.Ray(new BABYLON.Vector3(x, MAX_HEIGHT_DISPLACEMENT + 1, z),
+                                  new BABYLON.Vector3(0, -1, 0));
+    var info = ground.intersects(downRay, false);
+    return info.pickedPoint.y;
 }
 
-function buildTrees(){
-
+function getRandomPositionOnGround() {
      // Returns a random integer between min (inclusive) and max (inclusive)
      // Using Math.round() will give you a non-uniform distribution!
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    var mat = new BABYLON.StandardMaterial("material",scene);
-    mat.ambientTexture = new BABYLON.Texture("/ia/tree.jpg",scene);
-    var trees = [];
-    BABYLON.SceneLoader.ImportMesh("", "blender/", "tree1.babylon", scene, function (tree1) {
-        trees[0]=tree1[0];
-        BABYLON.SceneLoader.ImportMesh("", "blender/", "tree2.babylon", scene, function (tree2) {
-            trees[1]=tree2[0];
-            BABYLON.SceneLoader.ImportMesh("", "blender/", "tree3.babylon", scene, function (tree3) {
-                trees[2]=tree3[0];
-                BABYLON.SceneLoader.ImportMesh("", "blender/", "tree4.babylon", scene, function (tree4) {
-                    trees[3]=tree4[0];
-                    BABYLON.SceneLoader.ImportMesh("", "blender/", "tree5.babylon", scene, function (tree5) {
-                        trees[4]=tree5[0];
-                        BABYLON.SceneLoader.ImportMesh("", "blender/", "tree6.babylon", scene, function (tree6) {
-                            trees[5]=tree6[0];
-                            BABYLON.SceneLoader.ImportMesh("", "blender/", "tree7.babylon", scene, function (tree7) {
-                                trees[6]=tree7[0];
-                                BABYLON.SceneLoader.ImportMesh("", "blender/", "tree8.babylon", scene, function (tree8) {
-                                    trees[7]=tree8[0];
-                                    BABYLON.SceneLoader.ImportMesh("", "blender/", "tree9.babylon", scene, function (tree9) {
-                                        trees[8]=tree9[0];
-                                        BABYLON.SceneLoader.ImportMesh("", "blender/", "tree10.babylon", scene, function (tree10) {
-                                            trees[9]=tree10[0];
-                                            for (var z = (-MAP_HEIGHT/2) + 26; z < MAP_HEIGHT/2 - 26; z += 50) {
-                                                 for (var x = (-MAP_WIDTH/2) + 26; x < MAP_WIDTH/2 -26; x += 50) {
-                                                    var i = getRandomInt(-20,20);
-                                                    var j = getRandomInt(-20,20);
-                                                    var y = getGroundHeight(x+i,z+j);
-                                                    var t = getRandomInt(0,9);
-                                                    var tree = trees[t];
-                                                    tree.material = mat;
-                                                    if (y > 1) { addTree(x+i,y,z+j,tree.clone()); }
-                                                }
-                                            }
-                                            for (var k = 0; k < 10; k++){
-                                                trees[k].dispose();
-                                            }
-                                            audio.play();
-                                            document.getElementById("loadingcontent").innerHTML = "Click Anywhere to Begin";
-                                            document.getElementById("loading").addEventListener("click", function(evt) {
-                                                document.getElementById("loading").style.display = "none";
-                                            }, false);
-                                       });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
+
+    var MAP_MIN_X = -MAP_WIDTH /2;
+    var MAP_MAX_X =  MAP_WIDTH /2;
+    var MAP_MIN_Z = -MAP_HEIGHT/2;
+    var MAP_MAX_Z =  MAP_HEIGHT/2;
+
+    var x = getRandomInt(MAP_MIN_X, MAP_MAX_X);
+    var z = getRandomInt(MAP_MIN_Z, MAP_MAX_Z);
+
+    return new BABYLON.Vector3(x, getGroundHeight(x, z), z);
 }
 
-function getGroundHeight(x,z){
-    ground.refreshBoundingInfo();
-	var downRay = new BABYLON.Ray(new BABYLON.Vector3(x,100,z), new BABYLON.Vector3(0,-1,0));
-	var info = ground.intersects(downRay,false);
-	return info.pickedPoint.y;
+function getRandomPositionAbove(minimumAltitude) {
+    var randomPosition = getRandomPositionOnGround();
+    while (randomPosition.y < minimumAltitude) {
+        randomPosition = getRandomPositionOnGround();
+    }
+    return randomPosition;
 }
 
-function addCamera(initialLocation) {
-    var camera = new BABYLON.FreeCamera("camera", initialLocation, scene);
+function startLoadingTrees(){
+    var treeMaterial = new BABYLON.StandardMaterial("material",scene);
+    treeMaterial.ambientTexture = new BABYLON.Texture("textures/tree.jpg",scene);
+
+    var numberOfTreeMeshes = 10;
+    var numberOfEachTreeToPlace = 40;
+
+    for (var i = 1; i <= numberOfTreeMeshes; i++) {
+        var treeLoadCallback = function (meshesJustLoaded) {
+            var tree = meshesJustLoaded[0];
+            for (var i = 0; i < numberOfEachTreeToPlace; i++) {
+                var treePosition = getRandomPositionOnGround();
+                if (treePosition.y > WATER_LEVEL) {
+                    var treeToPlace = tree.clone();
+                    treeToPlace.position = treePosition;
+                    treeToPlace.refreshBoundingInfo();
+                    treeToPlace.checkCollisions = true;
+                    treeToPlace.material = treeMaterial;
+                } else {
+                    // Skip any trees we would've placed below the water level.
+                    // This approximates a constant density of trees rather than
+                    // a constant number of them.
+                }
+            }
+            tree.dispose();  // dispose original trees so they aren't rendered at origin
+        };
+
+        var pathToTreeMesh = "tree" + i + ".babylon";
+        BABYLON.SceneLoader.ImportMesh("", "blender/", pathToTreeMesh, scene, treeLoadCallback);
+    }
+}
+
+function addCameraAtRandomPosition() {
+    // I don't know the math behind why this is 2 * PLAYER_HEIGHT, but
+    // using PLAYER_HEIGHT will spawn you 'waist-deep' in the ground.
+    var playerHeightVector =  new BABYLON.Vector3(0, 2 * PLAYER_HEIGHT, 0);
+    var initialPosition = getRandomPositionAbove(MIN_SPAWN_ALTITUDE).add(playerHeightVector);
+    var camera = new BABYLON.FreeCamera("camera", initialPosition, scene);
     camera.applyGravity = true;
     camera.checkCollisions = true;
+    // point the camera toward the origin looking level with the horizon
+    camera.setTarget(new BABYLON.Vector3(0, initialPosition.y, 0));
     // ellipsoid around camera that determines player collisions
     camera.ellipsoid = new BABYLON.Vector3(1, PLAYER_HEIGHT, 1);
     // attach camera to global canvas and prevent other sources from handling its javascript events
@@ -192,25 +184,54 @@ function createSkybox(){
 }
 
 function createWater(){
-    water = BABYLON.Mesh.CreateGround("water", MAP_WIDTH, MAP_HEIGHT, 1, scene, false);
+    water = BABYLON.Mesh.CreateGround("water", MAP_WIDTH, MAP_HEIGHT, WATER_LEVEL, scene, false);
     var waterMaterial = new BABYLON.StandardMaterial("waterMaterial", scene);
     waterMaterial.backFaceCulling = false;
     waterMaterial.diffuseTexture = new BABYLON.Texture("skybox/skybox_py.jpg", scene);
     water.material = waterMaterial;
 }
 
+function playAudio() {
+    var audio  = document.createElement('audio');
+    audio.src = "audio/song.mp3"
+    audio.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+    }, false);
+    audio.play();
+}
+
+function startRenderLoop() {
+    engine.runRenderLoop(function () {
+        scene.render();
+        displayPositionVector();
+    });
+}
 
 function createScene() {
     scene = initializeScene();
 
-    addCamera(new BABYLON.Vector3(0, MAX_HEIGHT_DISPLACEMENT + PLAYER_HEIGHT, 0));
-
     var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(5000, 5000, 0), scene);
     light.intensity = .5;
     addHeightmappedGround();
-    createWater();
     createSkybox();
-};
+    createWater();
+    playAudio();
+
+    scene.gravity = NORMAL_GRAVITY;
+
+    var displayReadyToBegin = function() {
+        document.getElementById("loadingcontent").innerHTML = "Click Anywhere to Begin";
+        document.getElementById("loading").addEventListener("click", function(evt) {
+            document.getElementById("loading").style.display = "none";
+        }, false);
+    }
+
+    scene.executeWhenReady(addCameraAtRandomPosition);
+    scene.executeWhenReady(startLoadingTrees);
+    scene.executeWhenReady(displayReadyToBegin);
+    scene.executeWhenReady(startRenderLoop);
+}
 
 
 function displayPositionVector() {
@@ -230,18 +251,6 @@ function fixGravity(){
 }
 
 createScene();
-
-var initialized = false;
-// Register a render loop to repeatedly render the scene
-engine.runRenderLoop(function () {
-    if(!initialized && scene.isReady()){
-        buildTrees(scene);
-        initialized = true;
-    }
-    scene.render();
-    if(initialized){fixGravity();}
-    displayPositionVector();
-});
 
 // Watch for browser/canvas resize events
 window.addEventListener("resize", function () {
