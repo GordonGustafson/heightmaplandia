@@ -63,29 +63,30 @@ function startLoadingTrees(){
     var treeMaterial = new BABYLON.StandardMaterial("material",scene);
     treeMaterial.ambientTexture = new BABYLON.Texture("textures/tree.jpg",scene);
 
-    var numberOfTreeMeshes = 10;
     var numberOfEachTreeToPlace = 40;
+    var numberOfTreeMeshes = 10;
 
-    for (var i = 1; i <= numberOfTreeMeshes; i++) {
-        var treeLoadCallback = function (meshesJustLoaded) {
-            var tree = meshesJustLoaded[0];
-            for (var i = 0; i < numberOfEachTreeToPlace; i++) {
-                var treePosition = getRandomPositionOnGround();
-                if (treePosition.y > WATER_LEVEL) {
-                    var treeToPlace = tree.clone();
-                    treeToPlace.position = treePosition;
-                    treeToPlace.refreshBoundingInfo();
-                    treeToPlace.checkCollisions = true;
-                    treeToPlace.material = treeMaterial;
-                } else {
-                    // Skip any trees we would've placed below the water level.
-                    // This approximates a constant density of trees rather than
-                    // a constant number of them.
-                }
+    var treeLoadCallback = function (meshesJustLoaded) {
+        var tree = meshesJustLoaded[0];
+        for (var i = 0; i < numberOfEachTreeToPlace; i++) {
+            var treePosition = getRandomPositionOnGround();
+            if (treePosition.y > WATER_LEVEL) {
+                var treeToPlace = tree.clone();
+                treeToPlace.position = treePosition;
+                treeToPlace.refreshBoundingInfo();
+                treeToPlace.checkCollisions = true;
+                treeToPlace.material = treeMaterial;
+            } else {
+                // Skip any trees we would've placed below the water level.
+                // This approximates a constant density of trees rather than
+                // a constant number of them.
             }
-            tree.dispose();  // dispose original trees so they aren't rendered at origin
-        };
+        }
+        tree.dispose();  // dispose original trees so they aren't rendered at origin
+    };
 
+    // go from [1, numberOfTreeMeshes] since that's how the images are numbered
+    for (var i = 1; i <= numberOfTreeMeshes; i++) {
         var pathToTreeMesh = "tree" + i + ".babylon";
         BABYLON.SceneLoader.ImportMesh("", "blender/", pathToTreeMesh, scene, treeLoadCallback);
     }
