@@ -4,7 +4,7 @@ var scene;
 var ground;
 var water;
 
-var PATH_TO_HEIGHTMAP = "heightmaps/3.jpg";
+var PATH_TO_HEIGHTMAP = "heightmaps/generated.png";
 var MAP_WIDTH = 2048;           // corresponds to x coordinate of map
 var MAP_HEIGHT = 2048;          // corresponds to z coordinate of map
 var MAP_SUBDIVISIONS = 128;

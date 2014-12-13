@@ -1,7 +1,7 @@
 import Image
 from perlin import SimplexNoise
 
-OUTPUT_PATH = "test_2.png"
+OUTPUT_PATH = "../heightmaps/generated.png"
 
 IMAGE_WIDTH  = 2048
 IMAGE_HEIGHT = 2048
