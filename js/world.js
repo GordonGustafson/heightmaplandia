@@ -4,7 +4,7 @@ var scene;
 var ground;
 var water;
 
-var PATH_TO_HEIGHTMAP = "heightmaps/3.jpg";
+var PATH_TO_HEIGHTMAP = "heightmaps/generated.png";
 var MAP_WIDTH = 2048;           // corresponds to x coordinate of map
 var MAP_HEIGHT = 2048;          // corresponds to z coordinate of map
 var MAP_SUBDIVISIONS = 128;
@@ -16,7 +16,7 @@ var BASE_SPEED = .5
 var SPRINT_SPEED = 3
 var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.06, 0);
 var PLAYER_HEIGHT = 1;
-var WATER_LEVEL = 1;
+var WATER_LEVEL = 0;  // cannot be changed as long as we use createGround to make the water
 
 function initializeScene() {
     var scene = new BABYLON.Scene(engine);
@@ -184,7 +184,9 @@ function createSkybox(){
 }
 
 function createWater(){
-    water = BABYLON.Mesh.CreateGround("water", MAP_WIDTH, MAP_HEIGHT, WATER_LEVEL, scene, false);
+    WATER_SUBDIVISIONS = 1;     // no sense in adding more since it's a flat plane
+    water = BABYLON.Mesh.CreateGround("water", MAP_WIDTH, MAP_HEIGHT,
+                                      WATER_SUBDIVISIONS, scene, MAKE_MESH_UPDATABLE);
     var waterMaterial = new BABYLON.StandardMaterial("waterMaterial", scene);
     waterMaterial.backFaceCulling = false;
     waterMaterial.diffuseTexture = new BABYLON.Texture("skybox/skybox_py.jpg", scene);
