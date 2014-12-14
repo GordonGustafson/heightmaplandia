@@ -19,12 +19,6 @@ var PLAYER_HEIGHT = 1;
 var WATER_LEVEL = 1;
 var NUMBER_OF_HINTBOXES = 20;
 
-function initializeScene() {
-    var scene = new BABYLON.Scene(engine);
-    scene.collisionsEnabled = true;
-    return scene;
-}
-
 function getGroundHeight(x, z){
     var downRay = new BABYLON.Ray(new BABYLON.Vector3(x, MAX_HEIGHT_DISPLACEMENT + 1, z),
                                   new BABYLON.Vector3(0, -1, 0));
@@ -283,7 +277,8 @@ function placeHintboxAt(hintboxLocation, destination) {
 
 
 function createScene() {
-    scene = initializeScene();
+    scene = new BABYLON.Scene(engine);
+    scene.collisionsEnabled = true;
 
     var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(5000, 5000, 0), scene);
     light.intensity = .5;
@@ -339,16 +334,6 @@ function createScene() {
     scene.executeWhenReady(startRenderLoop);
 }
 
-
-
-function fixGravity(){
-    var p = scene.activeCamera.position;
-    if (Math.abs((p.y - getGroundHeight(p.x,p.z))) > 3){
-        scene.activeCamera.position.y -= 0.02;
-    } else {
-        scene.gravity = NORMAL_GRAVITY;
-    }
-}
 
 createScene();
 
