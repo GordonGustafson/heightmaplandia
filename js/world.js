@@ -150,18 +150,16 @@ function addHeightmappedGround() {
                 uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
             });
 
-    function addTextureUniformToGround(pathToTexture, glslUniformName,scale) {
+    function addTextureUniformToGround(pathToTexture, glslUniformName) {
         var texture = new BABYLON.Texture(pathToTexture, scene);
         texture.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
         texture.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
-        texture.uScale = scale;
-        texture.vScale = scale;
         groundMaterial.setTexture(glslUniformName, texture);
     }
 
-    addTextureUniformToGround("textures/rock.jpg", "rockSampler",25);
-    addTextureUniformToGround("textures/grass.jpg", "grassSampler",1);
-    addTextureUniformToGround("textures/snow.jpg", "snowSampler",1);
+    addTextureUniformToGround("textures/rock.jpg", "rockSampler");
+    addTextureUniformToGround("textures/grass.jpg", "grassSampler");
+    addTextureUniformToGround("textures/snow.jpg", "snowSampler");
 
     groundMaterial.setFloat("MIN_TERRAIN_HEIGHT", MIN_HEIGHT_DISPLACEMENT);
     groundMaterial.setFloat("MAX_TERRAIN_HEIGHT", MAX_HEIGHT_DISPLACEMENT);
