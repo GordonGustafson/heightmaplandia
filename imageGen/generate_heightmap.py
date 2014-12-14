@@ -67,6 +67,7 @@ for x in range(IMAGE_WIDTH):
         (r,g,b) = pixelBuffer[x,y]
         intensity = (r+g+b)/3
         distance = min(x,y,IMAGE_HEIGHT-y,IMAGE_WIDTH-x) #Manhattan distance to map edge
+        distance = max(0,distance-5)
         #if (x==y):
         #   print "(%d,%d),%d,%d,%d" % (x,y,distance,intensity,intensity-(255*(1.0/((distance+1.0)**2))))
         intensity = max(0,intensity-(2048*(1.0/((distance+1)**2))))
