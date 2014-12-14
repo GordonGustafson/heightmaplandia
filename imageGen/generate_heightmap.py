@@ -5,8 +5,8 @@ from perlin import SimplexNoise
 OUTPUT_DIR = "../heightmaps/"
 OUTPUT_PATH = OUTPUT_DIR+"generated.png"
 
-IMAGE_WIDTH  = 1024
-IMAGE_HEIGHT = 1024
+IMAGE_WIDTH  = 2048
+IMAGE_HEIGHT = 2048
 frequencies = [300.0, 100.0, 75.0, 50.0, 5.0, 1.0]
 amplitudes  = [1.0,     0.6,  0.3,  0.2, 0.1, 0.05]
 octaveData = zip(frequencies, amplitudes)

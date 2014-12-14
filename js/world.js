@@ -7,9 +7,9 @@ var water;
 var PATH_TO_HEIGHTMAP = "heightmaps/blur.png";
 var MAP_WIDTH = 2048;           // corresponds to x coordinate of map
 var MAP_HEIGHT = 2048;          // corresponds to z coordinate of map
-var MAP_SUBDIVISIONS = 128;
+var MAP_SUBDIVISIONS = 150;
 var MIN_HEIGHT_DISPLACEMENT = -35;
-var MAX_HEIGHT_DISPLACEMENT = 60;
+var MAX_HEIGHT_DISPLACEMENT = 35;
 var MIN_SPAWN_ALTITUDE = 30;
 var MAKE_MESH_UPDATABLE = true;
 var BASE_SPEED = .5
