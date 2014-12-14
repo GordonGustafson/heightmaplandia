@@ -2,7 +2,6 @@ var canvas = document.getElementById("renderCanvas");
 var engine = new BABYLON.Engine(canvas, true);
 var scene;
 var ground;
-var treasure;
 var water;
 
 var PATH_TO_HEIGHTMAP = "heightmaps/3.jpg";
@@ -204,94 +203,82 @@ function playAudio() {
     audio.play();
 }
 
-function placeTreasureRandomly() {
-
+function placeTreasureAt(treasureLocation) {
     var treasureLoadCallback = function (meshesJustLoaded) {
-
-        function placeHintboxesRandomly() {
-
-            function animateHintboxAndParticleSystem(hintbox) {
-                var origin = hintbox.position;
-                var destination = treasure.position;
-                var distanceX = destination.x - origin.x;
-                var distanceY = destination.y - origin.y;
-                var distanceZ = destination.z - origin.z;
-                var distanceAway = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2) + Math.pow(distanceZ, 2))
-                var AnimationKeys = [{ frame: 0,   value: origin },
-                                     { frame: distanceAway, value: destination }];
-                var animationFPS = 30;
-                var hintboxAnimation = new BABYLON.Animation("hintbox_flying", "position", animationFPS,
-                                                              BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
-                                                              BABYLON.Animation.ANIMATIONLOOPMODE_RELATIVE);
-                hintboxAnimation.setKeys(AnimationKeys);
-                hintbox.animations.push(hintboxAnimation);
-                scene.beginAnimation(hintbox, 0, 200, true);
-
-                var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
-                particleSystem.particleTexture = new BABYLON.Texture("flare.png", scene);
-                particleSystem.emitter = hintbox;
-                particleSystem.minEmitBox = new BABYLON.Vector3(0, 0, 0);
-                particleSystem.maxEmitBox = new BABYLON.Vector3(0, 0, 0);
-                particleSystem.color1 = new BABYLON.Color4(1.0, 0.3, 0.1, 1.0);
-                particleSystem.color2 = new BABYLON.Color4(0.5, 0.4, 0.1, 1.0);
-                particleSystem.colorDead = new BABYLON.Color4(0.1, 0.1, 0.0, 0.0);
-                particleSystem.minSize = .25;
-                particleSystem.maxSize = 1.0;
-                particleSystem.minLifeTime = .5;
-                particleSystem.maxLifeTime = 1.0;
-                particleSystem.emitRate = 100;
-                particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
-                particleSystem.gravity = new BABYLON.Vector3(0, -10, 0);
-                particleSystem.direction1 = new BABYLON.Vector3((origin.x - destination.x)/10,
-                                                                (origin.y - destination.y)/10,
-                                                                (origin.z - destination.z)/10);
-                particleSystem.minAngularSpeed = 0;
-                particleSystem.maxAngularSpeed = Math.PI;
-                particleSystem.minEmitPower = .5;
-                particleSystem.maxEmitPower = 1.5;
-                particleSystem.updateSpeed = 0.005;
-                particleSystem.start();
-            }
-
-            for (var i = 0; i < NUMBER_OF_HINTBOXES; i++) {
-                var hintboxSideLength = 5;
-                var hintbox = BABYLON.Mesh.CreateBox("hintbox" + i.toString(), hintboxSideLength, scene);
-                hintbox.position = getRandomPositionAbove(WATER_LEVEL);
-                hintbox.checkCollisions = true;
-                // don't apply gravity to hintbox so it doesn't slide to bottom of lake!
-
-                window.addEventListener("click", function (evt) {
-                    var pickResult = scene.pick(evt.clientX, evt.clientY);
-                    var pickedMesh = pickResult.pickedMesh;
-                    if (pickedMesh.name.substring(0,7) == "hintbox") {
-                        animateHintboxAndParticleSystem(pickedMesh);
-                    }
-                });
-            }            
-        }
-
-        treasure = scene.getMeshByName("chest");
+        treasure = meshesJustLoaded[0];
         //treasure.material = new BABYLON.StandardMaterial("material01", scene);
         treasure.material = new BABYLON.StandardMaterial("treasureMaterial.png", scene);
-        treasure.position = getRandomPositionOnGround();
-        console.log(treasure.position);
+        treasure.position = treasureLocation;
         treasure.refreshBoundingInfo();
         treasure.checkCollisions = true;
-        placeHintboxesRandomly();
-    };
+        // don't apply gravity to treasure so it doesn't slide to bottom of lake!
+    }
 
     BABYLON.SceneLoader.ImportMesh("", "blender/", "treasure_chest.babylon", scene, treasureLoadCallback);
 
     window.addEventListener("click", function (evt) {
         var pickResult = scene.pick(evt.clientX, evt.clientY);
-        if (pickResult.pickedMesh == treasure) {
-            console.log("lolwut");
+        if (pickResult.pickedMesh === treasure) {
             treasure.isVisible = false;
-            //document.getElementById("win").innerHTML = "YOU WIN!";
+            document.getElementById("win").innerHTML = "YOU WIN!";
         }
     });
+}
 
-    // TODO: Make treasure chest rotate
+function placeHintboxAt(hintboxLocation, destination) {
+    /* Place a hintbox at hintboxLocation that will fly towards destination */
+
+    var hintboxSideLength = 50;
+    var hintbox = BABYLON.Mesh.CreateBox("hintbox", hintboxSideLength, scene);
+    hintbox.position = hintboxLocation;
+    hintbox.checkCollisions = true;
+    // don't apply gravity to hintbox so it doesn't slide to bottom of lake!
+
+    function animateHintboxAndParticleSystem(hintbox) {
+        var animationKeys = [{ frame: 0,   value: hintbox.position },
+                             { frame: 200, value: destination}];
+
+        var animationFPS = 30;
+        var hintboxAnimation = new BABYLON.Animation("hintbox_flying", "position", animationFPS,
+                                                 BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+                                                 BABYLON.Animation.ANIMATIONLOOPMODE_RELATIVE);
+        hintboxAnimation.setKeys(animationKeys);
+        hintbox.animations.push(hintboxAnimation);
+        scene.beginAnimation(hintbox, 0, 200, true);
+
+        var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
+        particleSystem.particleTexture = new BABYLON.Texture("flare.png", scene);
+        particleSystem.emitter = hintbox;
+        particleSystem.minEmitBox = new BABYLON.Vector3(0, 0, 0);
+        particleSystem.maxEmitBox = new BABYLON.Vector3(0, 0, 0);
+        particleSystem.color1 = new BABYLON.Color4(0.9, 0.6, 0.3, 1.0);
+        particleSystem.color2 = new BABYLON.Color4(0.4, 0.3, 0.3, 1.0);
+        particleSystem.colorDead = new BABYLON.Color4(0.1, 0.1, 0.0, 0.0);
+        particleSystem.minSize = 0.1;
+        particleSystem.maxSize = 0.5;
+        particleSystem.minLifeTime = 1.0;
+        particleSystem.maxLifeTime = 3.0;
+        particleSystem.emitRate = 1500;
+        particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+        particleSystem.gravity = new BABYLON.Vector3(0, -30, 0);
+        particleSystem.direction1 = new BABYLON.Vector3(destination.x - hintbox.position.x,
+                                                        8,
+                                                        destination.z - hintbox.position.z);
+        particleSystem.minAngularSpeed = 0;
+        particleSystem.maxAngularSpeed = Math.PI;
+        particleSystem.minEmitPower = 1;
+        particleSystem.maxEmitPower = 3;
+        particleSystem.updateSpeed = 0.005;
+
+        particleSystem.start();
+    }
+
+    window.addEventListener("click", function (evt) {
+        var pickResult = scene.pick(evt.clientX, evt.clientY);
+        if (pickResult.pickedMesh === hintbox) {
+            animateHintboxAndParticleSystem(hintbox);
+        }
+    });
 }
 
 function startRenderLoop() {
@@ -306,6 +293,7 @@ function createScene() {
 
     var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(5000, 5000, 0), scene);
     light.intensity = .5;
+
     addHeightmappedGround();
     createSkybox();
     createWater();
@@ -313,14 +301,30 @@ function createScene() {
 
     scene.gravity = NORMAL_GRAVITY;
 
+    var treasureLocation;
+
+    var placeTreasure = function() {
+        // we can't invoke getRandomPositionAbove until the scene is ready,
+        // so use the first callback to determine treasureLocation
+        treasureLocation = getRandomPositionAbove(WATER_LEVEL);
+        placeTreasureAt(treasureLocation);
+    };
+
+    var placeAllHintBoxes = function() {
+        for (var i = 0; i < NUMBER_OF_HINTBOXES; i++) {
+            placeHintboxAt(getRandomPositionAbove(WATER_LEVEL), treasureLocation);
+        }
+    };
+
     var displayReadyToBegin = function() {
         document.getElementById("loadingcontent").innerHTML = "Click Anywhere to Begin";
         document.getElementById("loading").addEventListener("click", function(evt) {
             document.getElementById("loading").style.display = "none";
         }, false);
-    }
+    };
 
-    scene.executeWhenReady(placeTreasureRandomly);
+    scene.executeWhenReady(placeTreasure);
+    scene.executeWhenReady(placeAllHintBoxes);
     scene.executeWhenReady(addCameraAtRandomPosition);
     scene.executeWhenReady(startLoadingTrees);
     scene.executeWhenReady(displayReadyToBegin);
