@@ -298,7 +298,7 @@ function createScene() {
     scene = new BABYLON.Scene(engine);
     scene.collisionsEnabled = true;
 
-    var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(5000, 5000, 0), scene);
+    var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(5000, 5000, -300), scene);
     light.intensity = .5;
 
     addHeightmappedGround();

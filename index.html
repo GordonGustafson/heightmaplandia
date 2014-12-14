@@ -44,7 +44,7 @@ varying vec3 vLight;
 void main() {
     vPosition = vec4( position, 1. );
     vNormal = normalize(normal);
-    vLight = normalize(vec3(.2,1,.2));//This is terrible hack
+    vLight = normalize(vec3(.6,.5,-.2));//This is terrible hack
 
     gl_Position = worldViewProjection * vPosition;
 }
@@ -100,8 +100,7 @@ void main() {
         }
     }
 
-    diffColor = diffColor * dot(vNormal,vLight);
-    diffColor.rgb = diffColor.rgb * 0.5;
+    diffColor.xyz = diffColor.xyz * (dot(vNormal,vLight)*0.85);
     gl_FragColor = diffColor;
 }
         </script>
