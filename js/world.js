@@ -199,12 +199,19 @@ function playAudio() {
 
 function placeTreasureAt(treasureLocation) {
     var treasureLoadCallback = function (meshesJustLoaded) {
-        treasure = meshesJustLoaded[0];
-        //treasure.material = new BABYLON.StandardMaterial("material01", scene);
-        treasure.material = new BABYLON.StandardMaterial("treasureMaterial.png", scene);
-        treasure.position = treasureLocation;
-        treasure.refreshBoundingInfo();
-        treasure.checkCollisions = true;
+        treasureBox = meshesJustLoaded[0];
+        treasureLid = meshesJustLoaded[1];
+
+        var treasureMaterial = new BABYLON.StandardMaterial("treasureMaterial", scene);
+        treasureMaterial.diffuseTexture = new BABYLON.Texture("textures/treasureMaterial.png", scene);
+        treasureMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+
+        treasureBox.material = treasureMaterial;
+        treasureLid.material = treasureMaterial;
+
+        treasureBox.position = treasureLocation;
+        treasureBox.refreshBoundingInfo();
+        treasureBox.checkCollisions = true;
         // don't apply gravity to treasure so it doesn't slide to bottom of lake!
     }
 
@@ -212,8 +219,9 @@ function placeTreasureAt(treasureLocation) {
 
     window.addEventListener("click", function (evt) {
         var pickResult = scene.pick(evt.clientX, evt.clientY);
-        if (pickResult.pickedMesh === treasure) {
-            treasure.isVisible = false;
+        if (pickResult.pickedMesh === treasureBox || pickResult.pickedMesh === treasureLid) {
+            treasureBox.isVisible = false;
+            treasureLid.isVisible = false;
             document.getElementById("win").innerHTML = "YOU WIN!";
         }
     });
@@ -241,7 +249,7 @@ function placeHintboxAt(hintboxLocation, destination) {
         scene.beginAnimation(hintbox, 0, 200, true);
 
         var particleSystem = new BABYLON.ParticleSystem("particles", 2000, scene);
-        particleSystem.particleTexture = new BABYLON.Texture("flare.png", scene);
+        particleSystem.particleTexture = new BABYLON.Texture("textures/flare.png", scene);
         particleSystem.emitter = hintbox;
         particleSystem.minEmitBox = new BABYLON.Vector3(0, 0, 0);
         particleSystem.maxEmitBox = new BABYLON.Vector3(0, 0, 0);
