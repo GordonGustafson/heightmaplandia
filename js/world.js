@@ -281,12 +281,6 @@ function placeHintboxAt(hintboxLocation, destination) {
     });
 }
 
-function startRenderLoop() {
-    engine.runRenderLoop(function () {
-        scene.render();
-        displayPositionVector();
-    });
-}
 
 function createScene() {
     scene = initializeScene();
@@ -323,6 +317,20 @@ function createScene() {
         }, false);
     };
 
+    var displayPositionVector = function() {
+        cameraPosition = scene.activeCamera.position;
+        document.getElementById("positionX").innerHTML = cameraPosition.x.toFixed(2);
+        document.getElementById("positionY").innerHTML = cameraPosition.y.toFixed(2);
+        document.getElementById("positionZ").innerHTML = cameraPosition.z.toFixed(2);
+    }
+
+    var startRenderLoop = function() {
+        engine.runRenderLoop(function () {
+            scene.render();
+            displayPositionVector();
+        });
+    }
+
     scene.executeWhenReady(placeTreasure);
     scene.executeWhenReady(placeAllHintBoxes);
     scene.executeWhenReady(addCameraAtRandomPosition);
@@ -332,12 +340,6 @@ function createScene() {
 }
 
 
-function displayPositionVector() {
-    cameraPosition = scene.activeCamera.position;
-    document.getElementById("positionX").innerHTML = cameraPosition.x.toFixed(2);
-    document.getElementById("positionY").innerHTML = cameraPosition.y.toFixed(2);
-    document.getElementById("positionZ").innerHTML = cameraPosition.z.toFixed(2);
-}
 
 function fixGravity(){
     var p = scene.activeCamera.position;
