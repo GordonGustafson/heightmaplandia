@@ -3,6 +3,7 @@ var engine = new BABYLON.Engine(canvas, true);
 var scene;
 var ground;
 var water;
+var skybox;
 
 var PATH_TO_HEIGHTMAP = "heightmaps/generated.png";
 var MAP_WIDTH = 2048;           // corresponds to x coordinate of map
@@ -143,6 +144,7 @@ function addHeightmappedGround() {
         MIN_HEIGHT_DISPLACEMENT, MAX_HEIGHT_DISPLACEMENT, scene, MAKE_MESH_UPDATABLE);
     ground.checkCollisions = true;
     ground.position.y = 0;
+    ground.backFaceCulling = false;
 
     var groundMaterial =
         new BABYLON.ShaderMaterial("ground", scene, { vertexElement: "groundVertexShader",
@@ -152,16 +154,18 @@ function addHeightmappedGround() {
                 uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
             });
 
-    function addTextureUniformToGround(pathToTexture, glslUniformName) {
+    function addTextureUniformToGround(pathToTexture, glslUniformName,scale) {
         var texture = new BABYLON.Texture(pathToTexture, scene);
         texture.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
         texture.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
+        texture.uScale = scale;
+        texture.vScale = scale;
         groundMaterial.setTexture(glslUniformName, texture);
     }
 
-    addTextureUniformToGround("textures/rock.jpg", "rockSampler");
-    addTextureUniformToGround("textures/grass.jpg", "grassSampler");
-    addTextureUniformToGround("textures/snow.jpg", "snowSampler");
+    addTextureUniformToGround("textures/rock.jpg", "rockSampler",25);
+    addTextureUniformToGround("textures/grass.jpg", "grassSampler",1);
+    addTextureUniformToGround("textures/snow.jpg", "snowSampler",1);
 
     groundMaterial.setFloat("MIN_TERRAIN_HEIGHT", MIN_HEIGHT_DISPLACEMENT);
     groundMaterial.setFloat("MAX_TERRAIN_HEIGHT", MAX_HEIGHT_DISPLACEMENT);
@@ -173,7 +177,7 @@ function addHeightmappedGround() {
 }
 
 function createSkybox(){
-    var skybox = BABYLON.Mesh.CreateBox("skyBox", 10000.0, scene);
+    skybox = BABYLON.Mesh.CreateBox("skyBox", 10000.0, scene);
     var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
     skyboxMaterial.backFaceCulling = false;
     skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("skybox/skybox", scene);
@@ -181,6 +185,7 @@ function createSkybox(){
     skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
     skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
     skybox.material = skyboxMaterial;
+
 }
 
 function createWater(){
@@ -190,6 +195,11 @@ function createWater(){
     var waterMaterial = new BABYLON.StandardMaterial("waterMaterial", scene);
     waterMaterial.backFaceCulling = false;
     waterMaterial.diffuseTexture = new BABYLON.Texture("skybox/skybox_py.jpg", scene);
+    waterMaterial.diffuseColor = new BABYLON.Color3(0.1, 0.1, 0.3);
+    waterMaterial.reflectionTexture = new BABYLON.MirrorTexture("mirror", 512, scene, true); //Create a mirror texture
+    waterMaterial.reflectionTexture.mirrorPlane = new BABYLON.Plane(0, -1.0, 0, -10.0);
+    waterMaterial.reflectionTexture.renderList = [skybox];
+    waterMaterial.reflectionTexture.level = 0.4;//Select the level (0.0 > 1.0) of the reflection
     water.material = waterMaterial;
 }
 
