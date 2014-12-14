@@ -5,8 +5,8 @@ from perlin import SimplexNoise
 OUTPUT_DIR = "../heightmaps/"
 OUTPUT_PATH = OUTPUT_DIR+"generated.png"
 
-IMAGE_WIDTH  = 2048
-IMAGE_HEIGHT = 2048
+IMAGE_WIDTH  = 1024
+IMAGE_HEIGHT = 1024
 frequencies = [300.0, 100.0, 75.0, 50.0, 5.0, 1.0]
 amplitudes  = [1.0,     0.6,  0.3,  0.2, 0.1, 0.05]
 octaveData = zip(frequencies, amplitudes)
@@ -40,6 +40,7 @@ print "Noise generated"
 # Advanced terrain shapping
 ##Parameters
 CLIP_POINTS = (70,200)
+
 ##
 spread = CLIP_POINTS[1] - CLIP_POINTS[0]
 for x in range(IMAGE_WIDTH):
@@ -56,4 +57,19 @@ for x in range(IMAGE_WIDTH):
 img.save(OUTPUT_DIR+"contrasted.png")
 
 #Do blur HACK HACK HACK
-img.filter(ImageFilter.BLUR).filter(ImageFilter.BLUR).filter(ImageFilter.BLUR).save(OUTPUT_DIR+"blur.png")
+img = img.filter(ImageFilter.BLUR).filter(ImageFilter.BLUR).filter(ImageFilter.BLUR)
+img.save(OUTPUT_DIR+"blur.png")
+pixelBuffer = img.load()
+
+## Edge falloff
+for x in range(IMAGE_WIDTH):
+    for y in range(IMAGE_HEIGHT):
+        (r,g,b) = pixelBuffer[x,y]
+        intensity = (r+g+b)/3
+        distance = min(x,y,IMAGE_HEIGHT-y,IMAGE_WIDTH-x) #Manhattan distance to map edge
+        #if (x==y):
+        #   print "(%d,%d),%d,%d,%d" % (x,y,distance,intensity,intensity-(255*(1.0/((distance+1.0)**2))))
+        intensity = max(0,intensity-(2048*(1.0/((distance+1)**2))))
+        intensity = int(intensity)
+        pixelBuffer[x,y] = (intensity,intensity,intensity)
+img.save(OUTPUT_DIR+"edgefall.png")
