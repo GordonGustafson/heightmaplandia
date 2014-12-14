@@ -33,13 +33,18 @@
 precision highp float;
 
 attribute vec3 position;
+attribute vec3 normal;
 
 uniform mat4 worldViewProjection;
 
 varying vec4 vPosition;
+varying vec3 vNormal;
+varying vec3 vLight;
 
 void main() {
     vPosition = vec4( position, 1. );
+    vNormal = normalize(normal);
+    vLight = normalize(vec3(.2,1,.2));//This is terrible hack
 
     gl_Position = worldViewProjection * vPosition;
 }
@@ -48,6 +53,8 @@ void main() {
 precision highp float;
 
 varying vec4 vPosition;
+varying vec3 vNormal;
+varying vec3 vLight;
 
 // assume the minimum terrain height is 0
 uniform float MAX_TERRAIN_HEIGHT;
@@ -72,10 +79,12 @@ void main() {
     TEXTURE_BOUNDARY_HEIGHTS[1] = 0.50;
     TEXTURE_BOUNDARY_HEIGHTS[2] = .95;
 
+    vec4 diffColor;
+
     if        (fractionOfMaxTerrainHeight < TEXTURE_BOUNDARY_HEIGHTS[0]) {
-        gl_FragColor = TEXTURE_COLORS_AT_CURRENT_XZ[0];
+        diffColor = TEXTURE_COLORS_AT_CURRENT_XZ[0];
     } else if (fractionOfMaxTerrainHeight > TEXTURE_BOUNDARY_HEIGHTS[NUMBER_OF_TEXTURES - 1]) {
-        gl_FragColor = TEXTURE_COLORS_AT_CURRENT_XZ[NUMBER_OF_TEXTURES - 1];
+        diffColor = TEXTURE_COLORS_AT_CURRENT_XZ[NUMBER_OF_TEXTURES - 1];
     } else {
         for (int i = 0; i < NUMBER_OF_TEXTURES - 1; i++) {
             float lowHeightBoundary  = TEXTURE_BOUNDARY_HEIGHTS[i];
@@ -86,10 +95,14 @@ void main() {
                                                                 (highHeightBoundary - lowHeightBoundary);
                 vec4 lowTextureColor  = TEXTURE_COLORS_AT_CURRENT_XZ[i];
                 vec4 highTextureColor = TEXTURE_COLORS_AT_CURRENT_XZ[i+1];
-                gl_FragColor = mix(lowTextureColor, highTextureColor, fractionBetweenHeightBoundaries);
+                diffColor = mix(lowTextureColor, highTextureColor, fractionBetweenHeightBoundaries);
             }
         }
     }
+
+    diffColor = diffColor * dot(vNormal,vLight);
+    diffColor.rgb = diffColor.rgb * 0.5;
+    gl_FragColor = diffColor;
 }
         </script>
 		<script src="js/world.js"></script>        
