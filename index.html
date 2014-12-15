@@ -59,6 +59,7 @@ varying vec3 vLight;
 uniform float MIN_TERRAIN_HEIGHT;  // may be negative
 uniform float MAX_TERRAIN_HEIGHT;
 uniform float TEXTURE_SQUARE_SIDE_LENGTH; // x or z distance before a texture square repeats
+uniform vec3 LIGHT_SOURCE_POSITION;
 
 // in order of increasing height
 uniform sampler2D heightSampler0;
@@ -88,7 +89,8 @@ void main() {
     float normalVectorCircleFraction = (normalVectorTheta / TWO_PI) + 0.5; // in range 0 to 1
     float cliffTexturesPerRotationAtHeightZero = 32.0;
 
-    float cliffTextureU = normalVectorCircleFraction * (1.0 - terrainHeightFraction) * cliffTexturesPerRotationAtHeightZero;
+    // float cliffTextureU = normalVectorCircleFraction * (1.0 - terrainHeightFraction) * cliffTexturesPerRotationAtHeightZero;
+    float cliffTextureU = vPosition.x + vPosition.z;
     // float cliffTextureU = fract( sqrt(vPosition.x * vPosition.x + vPosition.z * vPosition.z) );
     float cliffTextureV = vPosition.y / TEXTURE_SQUARE_SIDE_LENGTH;
     vec4 cliffTextureAtCurrentPoint = texture2D(cliffSampler, vec2(cliffTextureU, cliffTextureV));
@@ -97,7 +99,7 @@ void main() {
     // the colors of the corresponding textures. Otherwise, use only the top or bottom texture.
     float TEXTURE_BOUNDARY_HEIGHTS[NUMBER_OF_TEXTURES];
     TEXTURE_BOUNDARY_HEIGHTS[0] = 0.05;
-    TEXTURE_BOUNDARY_HEIGHTS[1] = 0.50;
+    TEXTURE_BOUNDARY_HEIGHTS[1] = 0.36363636;
     TEXTURE_BOUNDARY_HEIGHTS[2] = 0.70;
     TEXTURE_BOUNDARY_HEIGHTS[3] = 0.85;
     TEXTURE_BOUNDARY_HEIGHTS[4] = 0.95;
@@ -134,7 +136,11 @@ void main() {
     }
     vec4 finalColor = mix(heightbasedColor, cliffTextureAtCurrentPoint, cliffTextureBlendingFactor);
 
-    finalColor.xyz = finalColor.xyz * (dot(vNormal,vLight) * 0.85 + 0.15);
+    vec3 pointToLight = normalize(LIGHT_SOURCE_POSITION - vPosition.xyz);
+    float diffuseMultiplier = max(dot(vNormal, pointToLight), 0.0);
+    const float ambientMultiplier = 0.50;
+
+    finalColor.xyz = finalColor.xyz * (diffuseMultiplier * (1.0 - ambientMultiplier) + ambientMultiplier);
     gl_FragColor = finalColor;
 }
         </script>

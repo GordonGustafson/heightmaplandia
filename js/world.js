@@ -28,6 +28,7 @@ var DROWN_COUNTER = 0;
 var DROWN_TIME = 300;
 var START_TIME = 0;
 var END_TIME = 0;
+var LIGHT_SOURCE_POSITION = new BABYLON.Vector3(5000, 2400, 1200);
 
 function getGroundHeight(x, z){
     var downRay = new BABYLON.Ray(new BABYLON.Vector3(x, MAX_HEIGHT_DISPLACEMENT + 1, z),
@@ -177,6 +178,7 @@ function addHeightmappedGround() {
     groundMaterial.setFloat("MIN_TERRAIN_HEIGHT", MIN_HEIGHT_DISPLACEMENT);
     groundMaterial.setFloat("MAX_TERRAIN_HEIGHT", MAX_HEIGHT_DISPLACEMENT);
     groundMaterial.setFloat("TEXTURE_SQUARE_SIDE_LENGTH", TEXTURE_SQUARE_SIDE_LENGTH);
+    groundMaterial.setVector3("LIGHT_SOURCE_POSITION", LIGHT_SOURCE_POSITION);
 
 
     ground.material = groundMaterial;
