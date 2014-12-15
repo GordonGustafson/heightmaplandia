@@ -57,7 +57,7 @@ function startLoadingTrees(){
     var treeMaterial = new BABYLON.StandardMaterial("material",scene);
     treeMaterial.ambientTexture = new BABYLON.Texture("textures/tree.jpg",scene);
 
-    var numberOfEachTreeToPlace = 40;
+    var numberOfEachTreeToPlace = 80;
     var numberOfTreeMeshes = 10;
 
     var treeLoadCallback = function (meshesJustLoaded) {
@@ -199,12 +199,27 @@ function createWater(){
 
 function playAudio() {
     var audio  = document.createElement('audio');
+    audio.volume = .5;
     audio.src = "audio/song.mp3"
     audio.addEventListener('ended', function() {
         this.currentTime = 0;
         this.play();
     }, false);
+    var playing = true;
+    window.addEventListener('keydown', function(evt){
+        if(evt.keyCode == 77){
+            if(playing){
+                audio.pause();
+                playing = false;
+            }
+            else{
+                audio.play();
+                playing = true;
+            }
+        }
+    }, false);
     audio.play();
+    
 }
 
 function placeTreasureAt(treasureLocation) {
@@ -227,12 +242,13 @@ function placeTreasureAt(treasureLocation) {
 
     BABYLON.SceneLoader.ImportMesh("", "blender/", "treasure_chest.babylon", scene, treasureLoadCallback);
 
+    
     window.addEventListener("click", function (evt) {
         var pickResult = scene.pick(evt.clientX, evt.clientY);
         if (pickResult.pickedMesh === treasureBox || pickResult.pickedMesh === treasureLid) {
             treasureBox.isVisible = false;
-            treasureLid.isVisible = false;
-            document.getElementById("win").innerHTML = "YOU WIN!";
+            treasureLid.isVisible = false;                
+            document.getElementById("victory").style.display = "inline";
         }
     });
 }
@@ -328,6 +344,39 @@ function createScene() {
         document.getElementById("loading").addEventListener("click", function(evt) {
             document.getElementById("loading").style.display = "none";
         }, false);
+        //Add listener for help window and parameters window
+        var helpMenuUp = false;
+        window.addEventListener("keydown", function(event){
+            if (event.keyCode == 72) {  
+                if (helpMenuUp){
+                    document.getElementById("helpMenu").style.display = "none";
+                    document.getElementById("pos").style.display = "none";
+                    helpMenuUp = false;
+                }
+                else {
+                    document.getElementById("helpMenu").style.display = "inline";
+                    document.getElementById("pos").style.display = "inline";
+                    helpMenuUp = true;
+                }
+            };
+            if (event.keyCode == 80) {  
+                if (helpMenuUp){
+                    document.getElementById("params").style.display = "none";
+                    helpMenuUp = false;
+                }
+                else {
+                    document.getElementById("params").style.display = "inline";
+                    document.getElementById("speed").value = BASE_SPEED;
+                    document.getElementById("gravity").value = scene.gravity.y;
+                    helpMenuUp = true;
+                }
+            };
+        }, false);
+        document.getElementById("paramButton").addEventListener("click", function(){
+            scene.gravity.y = document.getElementById("gravity").value;
+            scene.activeCamera.speed = document.getElementById("speed").value;
+            BASE_SPEED = document.getElementById("speed").value;
+        });
     };
 
     var displayPositionVector = function() {
