@@ -67,7 +67,12 @@ uniform sampler2D heightSampler2;
 uniform sampler2D heightSampler3;
 uniform sampler2D heightSampler4;
 
+uniform sampler2D cliffSampler;
+
 void main() {
+    const float PI = 3.1415926;
+    const float TWO_PI = 2.0 * PI;
+
     // how high this point is; lowest possible gives 0, highest possible gives 1.
     float terrainHeightFraction = (vPosition.y - MIN_TERRAIN_HEIGHT) / (MAX_TERRAIN_HEIGHT - MIN_TERRAIN_HEIGHT);
 
@@ -78,6 +83,15 @@ void main() {
     textureColorsAtCurrentPoint[2] = texture2D(heightSampler2, vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
     textureColorsAtCurrentPoint[3] = texture2D(heightSampler3, vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
     textureColorsAtCurrentPoint[4] = texture2D(heightSampler4, vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
+
+    float normalVectorTheta = atan(vNormal.z, vNormal.x);                  // in range -pi to pi
+    float normalVectorCircleFraction = (normalVectorTheta / TWO_PI) + 0.5; // in range 0 to 1
+    float cliffTexturesPerRotationAtHeightZero = 32.0;
+
+    float cliffTextureU = normalVectorCircleFraction * (1.0 - terrainHeightFraction) * cliffTexturesPerRotationAtHeightZero;
+    // float cliffTextureU = fract( sqrt(vPosition.x * vPosition.x + vPosition.z * vPosition.z) );
+    float cliffTextureV = vPosition.y / TEXTURE_SQUARE_SIDE_LENGTH;
+    vec4 cliffTextureAtCurrentPoint = texture2D(cliffSampler, vec2(cliffTextureU, cliffTextureV));
 
     // If vPosition.y falls between two values adjacent in this array, linearly interpolate
     // the colors of the corresponding textures. Otherwise, use only the top or bottom texture.
@@ -109,8 +123,19 @@ void main() {
         }
     }
 
-    heightbasedColor.xyz = heightbasedColor.xyz * (dot(vNormal,vLight)*0.85);
-    gl_FragColor = heightbasedColor;
+    // phi is from xz-plane to vNormal
+    float MAX_PHI_FOR_CLIFF = PI / 4.0;
+    float MIN_COS_PHI_FOR_CLIFF = cos(MAX_PHI_FOR_CLIFF);
+    float cosinePhi = length(vNormal.xz);
+    float cliffTextureBlendingFactor = 0.0;
+    if (cosinePhi > MIN_COS_PHI_FOR_CLIFF) {
+        // blending factor moves from 0 to 1 as cosinePhi moves from MIN_COS_PHI_FOR_CLIFF to 1
+        cliffTextureBlendingFactor = (cosinePhi - MIN_COS_PHI_FOR_CLIFF) / (1.0 - MIN_COS_PHI_FOR_CLIFF);
+    }
+    vec4 finalColor = mix(heightbasedColor, cliffTextureAtCurrentPoint, cliffTextureBlendingFactor);
+
+    finalColor.xyz = finalColor.xyz * (dot(vNormal,vLight) * 0.85 + 0.15);
+    gl_FragColor = finalColor;
 }
         </script>
 		<script src="js/world.js"></script>        

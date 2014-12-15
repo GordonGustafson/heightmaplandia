@@ -169,6 +169,8 @@ function addHeightmappedGround() {
     addTextureUniformToGround("textures/grass.jpg", "heightSampler3"); // extend grassy area
     addTextureUniformToGround("textures/snow.jpg", "heightSampler4");
 
+    addTextureUniformToGround("textures/rock.jpg", "cliffSampler");
+
     groundMaterial.setFloat("MIN_TERRAIN_HEIGHT", MIN_HEIGHT_DISPLACEMENT);
     groundMaterial.setFloat("MAX_TERRAIN_HEIGHT", MAX_HEIGHT_DISPLACEMENT);
     groundMaterial.setFloat("TEXTURE_SQUARE_SIDE_LENGTH", TEXTURE_SQUARE_SIDE_LENGTH);
