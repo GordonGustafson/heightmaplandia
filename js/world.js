@@ -24,6 +24,8 @@ var PLAYER_HEIGHT = 1;
 var WATER_LEVEL = 0;  // cannot be changed as long as we use createGround to make the water
 var NUMBER_OF_HINTBOXES = 20;
 var TEXTURE_SQUARE_SIDE_LENGTH = 4; // x or z distance before a texture square repeats
+var DROWN_COUNTER = 0;
+var DROWN_TIME = 300;
 
 function getGroundHeight(x, z){
     var downRay = new BABYLON.Ray(new BABYLON.Vector3(x, MAX_HEIGHT_DISPLACEMENT + 1, z),
@@ -418,12 +420,36 @@ function createScene() {
             currentParticleSystem.stop();
         }
     };
+    
+    var checkDrowning = function() {
+        cameraPosition = scene.activeCamera.position.y;
+        if (DROWN_COUNTER >= DROWN_TIME){
+            engine.stopRenderLoop();
+            document.getElementById("drowning").style.display = "none";
+            document.getElementById("drowningMessage").style.display = "none";
+            document.getElementById("lost").style.display = "inline";     
+            document.getElementById("lostMessage").style.display = "inline";                   
+        }
+        else{
+            if (cameraPosition < -.2){
+                document.getElementById("drowning").style.display = "inline";
+                document.getElementById("drowningMessage").style.display = "inline";
+                DROWN_COUNTER += 1;
+            }
+            else{
+                document.getElementById("drowning").style.display = "none";
+                document.getElementById("drowningMessage").style.display = "none";
+                DROWN_COUNTER = 0;
+            }
+        }
+    }
 
     var startRenderLoop = function() {
         engine.runRenderLoop(function () {
             scene.render();
             displayPositionVector();
             stopCurrentHintboxOnReachingTreasure();
+            checkDrowning();
         });
     };
 
