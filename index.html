@@ -58,6 +58,7 @@ varying vec3 vLight;
 
 uniform float MIN_TERRAIN_HEIGHT;  // may be negative
 uniform float MAX_TERRAIN_HEIGHT;
+uniform float TEXTURE_SQUARE_SIDE_LENGTH; // x or z distance before a texture square repeats
 
 uniform sampler2D rockSampler;
 uniform sampler2D grassSampler;
@@ -68,10 +69,10 @@ void main() {
     float terrainHeightFraction = (vPosition.y - MIN_TERRAIN_HEIGHT) / (MAX_TERRAIN_HEIGHT - MIN_TERRAIN_HEIGHT);
 
     const int NUMBER_OF_TEXTURES = 3;
-    vec4 TEXTURE_COLORS_AT_CURRENT_XZ[NUMBER_OF_TEXTURES];
-    TEXTURE_COLORS_AT_CURRENT_XZ[0] = texture2D(rockSampler,  vPosition.xz);
-    TEXTURE_COLORS_AT_CURRENT_XZ[1] = texture2D(grassSampler, vPosition.xz);
-    TEXTURE_COLORS_AT_CURRENT_XZ[2] = texture2D(snowSampler,  vPosition.xz);
+    vec4 TEXTURE_COLORS_AT_CURRENT_POINT[NUMBER_OF_TEXTURES];
+    TEXTURE_COLORS_AT_CURRENT_POINT[0] = texture2D(rockSampler,  vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
+    TEXTURE_COLORS_AT_CURRENT_POINT[1] = texture2D(grassSampler, vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
+    TEXTURE_COLORS_AT_CURRENT_POINT[2] = texture2D(snowSampler,  vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
 
     // If vPosition.y falls between two values adjacent in this array, linearly interpolate
     // the colors of the corresponding textures. Otherwise, use only the top or bottom texture.
@@ -94,8 +95,8 @@ void main() {
                 terrainHeightFraction < highHeightBoundary) {
                 float fractionBetweenHeightBoundaries = (terrainHeightFraction - lowHeightBoundary) /
                                                                 (highHeightBoundary - lowHeightBoundary);
-                vec4 lowTextureColor  = TEXTURE_COLORS_AT_CURRENT_XZ[i];
-                vec4 highTextureColor = TEXTURE_COLORS_AT_CURRENT_XZ[i+1];
+                vec4 lowTextureColor  = TEXTURE_COLORS_AT_CURRENT_POINT[i];
+                vec4 highTextureColor = TEXTURE_COLORS_AT_CURRENT_POINT[i+1];
                 diffColor = mix(lowTextureColor, highTextureColor, fractionBetweenHeightBoundaries);
             }
         }
