@@ -229,7 +229,7 @@ function placeTreasureAt(treasureLocation) {
         treasureLid = meshesJustLoaded[1];
 
         var treasureMaterial = new BABYLON.StandardMaterial("treasureMaterial", scene);
-        treasureMaterial.diffuseTexture = new BABYLON.Texture("textures/treasureMaterial.png", scene);
+        treasureMaterial.diffuseTexture = new BABYLON.Texture("textures/treasureMaterial.jpg", scene);
         treasureMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
 
         treasureBox.material = treasureMaterial;
