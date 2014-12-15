@@ -23,6 +23,7 @@ var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.06, 0);
 var PLAYER_HEIGHT = 1;
 var WATER_LEVEL = 0;  // cannot be changed as long as we use createGround to make the water
 var NUMBER_OF_HINTBOXES = 20;
+var TEXTURE_SQUARE_SIDE_LENGTH = 4; // x or z distance before a texture square repeats
 
 function getGroundHeight(x, z){
     var downRay = new BABYLON.Ray(new BABYLON.Vector3(x, MAX_HEIGHT_DISPLACEMENT + 1, z),
@@ -161,12 +162,18 @@ function addHeightmappedGround() {
         groundMaterial.setTexture(glslUniformName, texture);
     }
 
-    addTextureUniformToGround("textures/rock.jpg", "rockSampler");
-    addTextureUniformToGround("textures/grass.jpg", "grassSampler");
-    addTextureUniformToGround("textures/snow.jpg", "snowSampler");
+    // in order of increasing height
+    addTextureUniformToGround("textures/seafloor.jpg", "heightSampler0");
+    addTextureUniformToGround("textures/sand.jpg", "heightSampler1");
+    addTextureUniformToGround("textures/grass.jpg", "heightSampler2");
+    addTextureUniformToGround("textures/grass.jpg", "heightSampler3"); // extend grassy area
+    addTextureUniformToGround("textures/snow.jpg", "heightSampler4");
+
+    addTextureUniformToGround("textures/rock.jpg", "cliffSampler");
 
     groundMaterial.setFloat("MIN_TERRAIN_HEIGHT", MIN_HEIGHT_DISPLACEMENT);
     groundMaterial.setFloat("MAX_TERRAIN_HEIGHT", MAX_HEIGHT_DISPLACEMENT);
+    groundMaterial.setFloat("TEXTURE_SQUARE_SIDE_LENGTH", TEXTURE_SQUARE_SIDE_LENGTH);
 
 
     ground.material = groundMaterial;
