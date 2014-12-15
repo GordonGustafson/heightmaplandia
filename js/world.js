@@ -5,6 +5,9 @@ var ground;
 var water;
 var skybox;
 
+var currentHintbox;
+var currentParticleSystem;
+
 var PATH_TO_HEIGHTMAP = "heightmaps/edgefall.png";
 var MAP_WIDTH = 2048;           // corresponds to x coordinate of map
 var MAP_HEIGHT = 2048;          // corresponds to z coordinate of map
@@ -257,20 +260,29 @@ function placeTreasureAt(treasureLocation) {
 function placeHintboxAt(hintboxLocation, destination) {
     /* Place a hintbox at hintboxLocation that will fly towards destination */
 
-    var hintboxSideLength = 50;
-    var hintbox = BABYLON.Mesh.CreateBox("hintbox", hintboxSideLength, scene);
+    var hintboxSideLength = 5;
+    var hintboxSubdivisions = 5;
+    var hintbox = BABYLON.Mesh.CreateSphere("hintbox", hintboxSubdivisions, hintboxSideLength, scene);
     hintbox.position = hintboxLocation;
     hintbox.checkCollisions = true;
     // don't apply gravity to hintbox so it doesn't slide to bottom of lake!
 
     function animateHintboxAndParticleSystem(hintbox) {
-        var animationKeys = [{ frame: 0,   value: hintbox.position },
-                             { frame: 200, value: destination}];
+        currentHintbox = hintbox;
+        var originalPosition = hintbox.position;
+        var distanceX = destination.x - originalPosition.x;
+        var distanceY = destination.y - originalPosition.y;
+        var distanceZ = destination.z - originalPosition.z;
+        var distanceAway = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2) + Math.pow(distanceZ, 2));
+        var animationKeys = [];
+        animationKeys.push({ frame: 0, value: originalPosition });
+        animationKeys.push({ frame: 30, value: new BABYLON.Vector3(originalPosition.x, MAX_HEIGHT_DISPLACEMENT, originalPosition.z) });
+        animationKeys.push({ frame: 30 + (distanceAway/10), value: new BABYLON.Vector3(destination.x, MAX_HEIGHT_DISPLACEMENT, destination.z) });
 
         var animationFPS = 30;
         var hintboxAnimation = new BABYLON.Animation("hintbox_flying", "position", animationFPS,
                                                  BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
-                                                 BABYLON.Animation.ANIMATIONLOOPMODE_RELATIVE);
+                                                 BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
         hintboxAnimation.setKeys(animationKeys);
         hintbox.animations.push(hintboxAnimation);
         scene.beginAnimation(hintbox, 0, 200, true);
@@ -283,22 +295,23 @@ function placeHintboxAt(hintboxLocation, destination) {
         particleSystem.color1 = new BABYLON.Color4(0.9, 0.6, 0.3, 1.0);
         particleSystem.color2 = new BABYLON.Color4(0.4, 0.3, 0.3, 1.0);
         particleSystem.colorDead = new BABYLON.Color4(0.1, 0.1, 0.0, 0.0);
-        particleSystem.minSize = 0.1;
-        particleSystem.maxSize = 0.5;
-        particleSystem.minLifeTime = 1.0;
-        particleSystem.maxLifeTime = 3.0;
-        particleSystem.emitRate = 1500;
+        particleSystem.minSize = 0.3;
+        particleSystem.maxSize = 1.0;
+        particleSystem.minLifeTime = 0.5;
+        particleSystem.maxLifeTime = 1.0;
+        particleSystem.emitRate = 1000;
         particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
-        particleSystem.gravity = new BABYLON.Vector3(0, -30, 0);
-        particleSystem.direction1 = new BABYLON.Vector3(destination.x - hintbox.position.x,
-                                                        8,
-                                                        destination.z - hintbox.position.z);
+        particleSystem.gravity = new BABYLON.Vector3(0, -10, 0);
+        particleSystem.direction1 = new BABYLON.Vector3((originalPosition.x - destination.x)/10,
+                                                        (originalPosition.y - destination.y)/10,
+                                                        (originalPosition.z - destination.z)/10);
         particleSystem.minAngularSpeed = 0;
         particleSystem.maxAngularSpeed = Math.PI;
         particleSystem.minEmitPower = 1;
         particleSystem.maxEmitPower = 3;
         particleSystem.updateSpeed = 0.005;
 
+        currentParticleSystem = particleSystem;
         particleSystem.start();
     }
 
@@ -388,14 +401,24 @@ function createScene() {
         document.getElementById("positionX").innerHTML = cameraPosition.x.toFixed(2);
         document.getElementById("positionY").innerHTML = cameraPosition.y.toFixed(2);
         document.getElementById("positionZ").innerHTML = cameraPosition.z.toFixed(2);
-    }
+    };
+
+    var stopCurrentHintboxOnReachingTreasure = function() {
+        if (currentHintbox != null &&
+            currentHintbox.position.x === treasureLocation.x &&
+            currentHintbox.position.z === treasureLocation.z) {
+            currentHintbox.isVisible = false;
+            currentParticleSystem.stop();
+        }
+    };
 
     var startRenderLoop = function() {
         engine.runRenderLoop(function () {
             scene.render();
             displayPositionVector();
+            stopCurrentHintboxOnReachingTreasure();
         });
-    }
+    };
 
     scene.executeWhenReady(placeTreasure);
     scene.executeWhenReady(placeAllHintBoxes);
