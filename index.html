@@ -164,13 +164,15 @@ void main() {
         <div id="victory" style="position: absolute; width: 100%; height: 100%; background-color: black; top:1px; opacity: .5; color:white; z-index:10; display: none;">
             <div style="position: relative; margin-top: 15%; text-align: center;">
                 <h1 style="font-size: 600%; text-align: center; margin-bottom:8%;">You've Won!</div>
+                <h1 id="timeW" style="position: relative; color: white; text-align: center; width: 90%; margin: 0 auto;"></h1>
                 <!--http://www.hibou-music.com/main-1445-1.html-->
             </div>
         </div>
-        <div id="lost" style="position: absolute; width: 100%; height: 100%; background-color: red; top:1px; opacity: .1; color:white; z-index:10; display: none;">
-        </div>
-        <div id="lostMessage" style="position: absolute; left: 30%; top: 35%; color:white; display:none;">
-            <h1 style="position: relative; font-size: 600%; margin-bottom:8%;">You Have Drowned.</div>
+        <div id="lost" style="position: absolute; width: 100%; height: 100%; background-color: black; top:1px; opacity: .5; color:white; z-index:10; display: none;">
+            <div style="position: relative; margin-top: 15%; text-align: center;">
+                <h1 style="font-size: 600%; text-align: center; margin-bottom:8%;">You Have Drowned.</div>
+                <h1 id="timeL" style="position: relative; color: white; text-align: center; width: 90%; margin: 0 auto;"></h1>
+            </div>
         </div>
         <div id="reticle" style="position: absolute; top: 49%; left: 49%;">+</div>
         <div id="helpMenu" style="position: absolute; width: 100%; height: 100%; background-color: black; top:1px; opacity: .5; color:white; z-index:10; display: none;">
@@ -200,7 +202,7 @@ void main() {
         <div id="drowning" style="position: absolute; width: 100%; height: 100%; background-color: red; top:1px; opacity: .1; color:white; z-index:10; display: none;">
         </div>
         <h1 id="drowningMessage" style="position: absolute; top:40%; left: 40%; color:white; display: none;">You Are Drowning!</h1> 
-        
+
    </body>
 
 </html>
