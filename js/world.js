@@ -20,6 +20,8 @@ var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.06, 0);
 var PLAYER_HEIGHT = 1;
 var WATER_LEVEL = 0;  // cannot be changed as long as we use createGround to make the water
 var NUMBER_OF_HINTBOXES = 20;
+var DROWN_COUNTER = 0;
+var DROWN_TIME = 300;
 
 function getGroundHeight(x, z){
     var downRay = new BABYLON.Ray(new BABYLON.Vector3(x, MAX_HEIGHT_DISPLACEMENT + 1, z),
@@ -389,11 +391,35 @@ function createScene() {
         document.getElementById("positionY").innerHTML = cameraPosition.y.toFixed(2);
         document.getElementById("positionZ").innerHTML = cameraPosition.z.toFixed(2);
     }
+    
+    var checkDrowning = function() {
+        cameraPosition = scene.activeCamera.position.y;
+        if (DROWN_COUNTER >= DROWN_TIME){
+            engine.stopRenderLoop();
+            document.getElementById("drowning").style.display = "none";
+            document.getElementById("drowningMessage").style.display = "none";
+            document.getElementById("lost").style.display = "inline";     
+            document.getElementById("lostMessage").style.display = "inline";                   
+        }
+        else{
+            if (cameraPosition < -.2){
+                document.getElementById("drowning").style.display = "inline";
+                document.getElementById("drowningMessage").style.display = "inline";
+                DROWN_COUNTER += 1;
+            }
+            else{
+                document.getElementById("drowning").style.display = "none";
+                document.getElementById("drowningMessage").style.display = "none";
+                DROWN_COUNTER = 0;
+            }
+        }
+    }
 
     var startRenderLoop = function() {
         engine.runRenderLoop(function () {
             scene.render();
             displayPositionVector();
+            checkDrowning();
         });
     }
 
