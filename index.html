@@ -60,33 +60,40 @@ uniform float MIN_TERRAIN_HEIGHT;  // may be negative
 uniform float MAX_TERRAIN_HEIGHT;
 uniform float TEXTURE_SQUARE_SIDE_LENGTH; // x or z distance before a texture square repeats
 
-uniform sampler2D rockSampler;
-uniform sampler2D grassSampler;
-uniform sampler2D snowSampler;
+// in order of increasing height
+uniform sampler2D heightSampler0;
+uniform sampler2D heightSampler1;
+uniform sampler2D heightSampler2;
+uniform sampler2D heightSampler3;
+uniform sampler2D heightSampler4;
 
 void main() {
     // how high this point is; lowest possible gives 0, highest possible gives 1.
     float terrainHeightFraction = (vPosition.y - MIN_TERRAIN_HEIGHT) / (MAX_TERRAIN_HEIGHT - MIN_TERRAIN_HEIGHT);
 
-    const int NUMBER_OF_TEXTURES = 3;
-    vec4 TEXTURE_COLORS_AT_CURRENT_POINT[NUMBER_OF_TEXTURES];
-    TEXTURE_COLORS_AT_CURRENT_POINT[0] = texture2D(rockSampler,  vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
-    TEXTURE_COLORS_AT_CURRENT_POINT[1] = texture2D(grassSampler, vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
-    TEXTURE_COLORS_AT_CURRENT_POINT[2] = texture2D(snowSampler,  vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
+    const int NUMBER_OF_TEXTURES = 5;
+    vec4 textureColorsAtCurrentPoint[NUMBER_OF_TEXTURES];
+    textureColorsAtCurrentPoint[0] = texture2D(heightSampler0, vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
+    textureColorsAtCurrentPoint[1] = texture2D(heightSampler1, vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
+    textureColorsAtCurrentPoint[2] = texture2D(heightSampler2, vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
+    textureColorsAtCurrentPoint[3] = texture2D(heightSampler3, vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
+    textureColorsAtCurrentPoint[4] = texture2D(heightSampler4, vPosition.xz / TEXTURE_SQUARE_SIDE_LENGTH);
 
     // If vPosition.y falls between two values adjacent in this array, linearly interpolate
     // the colors of the corresponding textures. Otherwise, use only the top or bottom texture.
     float TEXTURE_BOUNDARY_HEIGHTS[NUMBER_OF_TEXTURES];
     TEXTURE_BOUNDARY_HEIGHTS[0] = 0.05;
     TEXTURE_BOUNDARY_HEIGHTS[1] = 0.50;
-    TEXTURE_BOUNDARY_HEIGHTS[2] = 0.95;
+    TEXTURE_BOUNDARY_HEIGHTS[2] = 0.70;
+    TEXTURE_BOUNDARY_HEIGHTS[3] = 0.85;
+    TEXTURE_BOUNDARY_HEIGHTS[4] = 0.95;
 
-    vec4 diffColor;
+    vec4 heightbasedColor;
 
     if        (terrainHeightFraction < TEXTURE_BOUNDARY_HEIGHTS[0]) {
-        diffColor = TEXTURE_COLORS_AT_CURRENT_XZ[0];
+        heightbasedColor = textureColorsAtCurrentPoint[0];
     } else if (terrainHeightFraction > TEXTURE_BOUNDARY_HEIGHTS[NUMBER_OF_TEXTURES - 1]) {
-        diffColor = TEXTURE_COLORS_AT_CURRENT_XZ[NUMBER_OF_TEXTURES - 1];
+        heightbasedColor = textureColorsAtCurrentPoint[NUMBER_OF_TEXTURES - 1];
     } else {
         for (int i = 0; i < NUMBER_OF_TEXTURES - 1; i++) {
             float lowHeightBoundary  = TEXTURE_BOUNDARY_HEIGHTS[i];
@@ -95,15 +102,15 @@ void main() {
                 terrainHeightFraction < highHeightBoundary) {
                 float fractionBetweenHeightBoundaries = (terrainHeightFraction - lowHeightBoundary) /
                                                                 (highHeightBoundary - lowHeightBoundary);
-                vec4 lowTextureColor  = TEXTURE_COLORS_AT_CURRENT_POINT[i];
-                vec4 highTextureColor = TEXTURE_COLORS_AT_CURRENT_POINT[i+1];
-                diffColor = mix(lowTextureColor, highTextureColor, fractionBetweenHeightBoundaries);
+                vec4 lowTextureColor  = textureColorsAtCurrentPoint[i];
+                vec4 highTextureColor = textureColorsAtCurrentPoint[i+1];
+                heightbasedColor = mix(lowTextureColor, highTextureColor, fractionBetweenHeightBoundaries);
             }
         }
     }
 
-    diffColor.xyz = diffColor.xyz * (dot(vNormal,vLight)*0.85);
-    gl_FragColor = diffColor;
+    heightbasedColor.xyz = heightbasedColor.xyz * (dot(vNormal,vLight)*0.85);
+    gl_FragColor = heightbasedColor;
 }
         </script>
 		<script src="js/world.js"></script>        

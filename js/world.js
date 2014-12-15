@@ -162,9 +162,12 @@ function addHeightmappedGround() {
         groundMaterial.setTexture(glslUniformName, texture);
     }
 
-    addTextureUniformToGround("textures/rock.jpg", "rockSampler");
-    addTextureUniformToGround("textures/grass.jpg", "grassSampler");
-    addTextureUniformToGround("textures/snow.jpg", "snowSampler");
+    // in order of increasing height
+    addTextureUniformToGround("textures/seafloor.jpg", "heightSampler0");
+    addTextureUniformToGround("textures/sand.jpg", "heightSampler1");
+    addTextureUniformToGround("textures/grass.jpg", "heightSampler2");
+    addTextureUniformToGround("textures/grass.jpg", "heightSampler3"); // extend grassy area
+    addTextureUniformToGround("textures/snow.jpg", "heightSampler4");
 
     groundMaterial.setFloat("MIN_TERRAIN_HEIGHT", MIN_HEIGHT_DISPLACEMENT);
     groundMaterial.setFloat("MAX_TERRAIN_HEIGHT", MAX_HEIGHT_DISPLACEMENT);
