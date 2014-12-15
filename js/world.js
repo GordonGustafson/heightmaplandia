@@ -26,6 +26,8 @@ var NUMBER_OF_HINTBOXES = 20;
 var TEXTURE_SQUARE_SIDE_LENGTH = 4; // x or z distance before a texture square repeats
 var DROWN_COUNTER = 0;
 var DROWN_TIME = 300;
+var START_TIME = 0;
+var END_TIME = 0;
 
 function getGroundHeight(x, z){
     var downRay = new BABYLON.Ray(new BABYLON.Vector3(x, MAX_HEIGHT_DISPLACEMENT + 1, z),
@@ -40,7 +42,6 @@ function getRandomPositionOnGround() {
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-
     var MAP_MIN_X = -MAP_WIDTH /2;
     var MAP_MAX_X =  MAP_WIDTH /2;
     var MAP_MIN_Z = -MAP_HEIGHT/2;
@@ -235,6 +236,17 @@ function playAudio() {
     
 }
 
+function showElapsedTime(status){
+    var b = new Date();
+    END_TIME = Date.parse(b);
+    var timeDiff = END_TIME - START_TIME;
+    timeDiff = timeDiff/1000;
+    var seconds = Math.round(timeDiff % 60);
+    timeDiff = Math.floor(timeDiff / 60);
+    var minutes = Math.round(timeDiff % 60);
+    document.getElementById("time"+status).innerHTML = "Elapsed Time: " + minutes + ":" + seconds;
+}
+
 function placeTreasureAt(treasureLocation) {
     var treasureLoadCallback = function (meshesJustLoaded) {
         treasureBox = meshesJustLoaded[0];
@@ -262,6 +274,7 @@ function placeTreasureAt(treasureLocation) {
             treasureBox.isVisible = false;
             treasureLid.isVisible = false;                
             document.getElementById("victory").style.display = "inline";
+            showElapsedTime("W");
         }
     });
 }
@@ -336,7 +349,6 @@ function placeHintboxAt(hintboxLocation, destination) {
 function createScene() {
     scene = new BABYLON.Scene(engine);
     scene.collisionsEnabled = true;
-
     var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(5000, 5000, -300), scene);
     light.intensity = .5;
 
@@ -366,6 +378,8 @@ function createScene() {
         document.getElementById("loadingcontent").innerHTML = "Click Anywhere to Begin";
         document.getElementById("loading").addEventListener("click", function(evt) {
             document.getElementById("loading").style.display = "none";
+            var d = new Date();
+            START_TIME = Date.parse(d);
         }, false);
         //Add listener for help window and parameters window
         var helpMenuUp = false;
@@ -427,8 +441,8 @@ function createScene() {
             engine.stopRenderLoop();
             document.getElementById("drowning").style.display = "none";
             document.getElementById("drowningMessage").style.display = "none";
-            document.getElementById("lost").style.display = "inline";     
-            document.getElementById("lostMessage").style.display = "inline";                   
+            document.getElementById("lost").style.display = "inline";         
+            showElapsedTime("L");
         }
         else{
             if (cameraPosition < -.2){
