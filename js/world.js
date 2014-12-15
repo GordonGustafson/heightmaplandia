@@ -15,6 +15,7 @@ var MIN_SPAWN_ALTITUDE = 30;
 var MAKE_MESH_UPDATABLE = true;
 var BASE_SPEED = .5
 var SPRINT_SPEED = 3
+var SPRINT_ENABLED = false;
 var NORMAL_GRAVITY = new BABYLON.Vector3(0, -0.06, 0);
 var PLAYER_HEIGHT = 1;
 var WATER_LEVEL = 0;  // cannot be changed as long as we use createGround to make the water
@@ -127,7 +128,7 @@ function setupAdditionalCameraControls(camera) {
 
     //Sprint Functionality
     window.addEventListener("keydown", function(event){
-        if (event.keyCode == 16) { scene.activeCamera.speed = SPRINT_SPEED };
+        if (event.keyCode == 16 && SPRINT_ENABLED) { scene.activeCamera.speed = SPRINT_SPEED };
     });
     window.addEventListener("keyup", function(event){
         if (event.keyCode == 16) {  scene.activeCamera.speed = BASE_SPEED };
@@ -370,6 +371,9 @@ function createScene() {
                     document.getElementById("gravity").value = scene.gravity.y;
                     helpMenuUp = true;
                 }
+            };
+            if (event.keyCode == 71){
+                SPRINT_ENABLED = !SPRINT_ENABLED;
             };
         }, false);
         document.getElementById("paramButton").addEventListener("click", function(){
