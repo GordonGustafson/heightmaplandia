@@ -63,9 +63,6 @@ function getRandomPositionAbove(minimumAltitude) {
 }
 
 function startLoadingTrees(){
-    var treeMaterial = new BABYLON.StandardMaterial("material",scene);
-    treeMaterial.ambientTexture = new BABYLON.Texture("textures/tree.jpg",scene);
-
     var numberOfEachTreeToPlace = 80;
     var numberOfTreeMeshes = 10;
 
@@ -78,7 +75,6 @@ function startLoadingTrees(){
                 treeToPlace.position = treePosition;
                 treeToPlace.refreshBoundingInfo();
                 treeToPlace.checkCollisions = true;
-                treeToPlace.material = treeMaterial;
             } else {
                 // Skip any trees we would've placed below the water level.
                 // This approximates a constant density of trees rather than
