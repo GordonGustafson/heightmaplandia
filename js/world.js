@@ -62,7 +62,7 @@ function getRandomPositionAbove(minimumAltitude) {
     return randomPosition;
 }
 
-function startLoadingTrees(){
+function placeTreesRandomly(){
     var numberOfEachTreeToPlace = 80;
     var numberOfTreeMeshes = 10;
 
@@ -91,7 +91,7 @@ function startLoadingTrees(){
     }
 }
 
-function addCameraAtRandomPosition() {
+function placeCameraRandomly() {
     // I don't know the math behind why this is 2 * PLAYER_HEIGHT, but
     // using PLAYER_HEIGHT will spawn you 'waist-deep' in the ground.
     var playerHeightVector =  new BABYLON.Vector3(0, 2 * PLAYER_HEIGHT, 0);
@@ -182,7 +182,7 @@ function addHeightmappedGround() {
     return ground;
 }
 
-function createSkybox(){
+function addSkybox(){
     skybox = BABYLON.Mesh.CreateBox("skyBox", 10000.0, scene);
     var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
     skyboxMaterial.backFaceCulling = false;
@@ -194,7 +194,7 @@ function createSkybox(){
 
 }
 
-function createWater(){
+function addWater(){
     WATER_SUBDIVISIONS = 1;     // no sense in adding more since it's a flat plane
     water = BABYLON.Mesh.CreateGround("water", MAP_WIDTH, MAP_HEIGHT,
                                       WATER_SUBDIVISIONS, scene, MAKE_MESH_UPDATABLE);
@@ -351,28 +351,28 @@ function createScene() {
     light.intensity = .5;
 
     addHeightmappedGround();
-    createSkybox();
-    createWater();
+    addSkybox();
+    addWater();
     playAudio();
 
     scene.gravity = NORMAL_GRAVITY;
 
     var treasureLocation;
 
-    var placeTreasure = function() {
+    var placeTreasureRandomly = function() {
         // we can't invoke getRandomPositionAbove until the scene is ready,
         // so use the first callback to determine treasureLocation
         treasureLocation = getRandomPositionAbove(WATER_LEVEL);
         placeTreasureAt(treasureLocation);
     };
 
-    var placeAllHintBoxes = function() {
+    var placeHintboxesRandomly = function() {
         for (var i = 0; i < NUMBER_OF_HINTBOXES; i++) {
             placeHintboxAt(getRandomPositionAbove(WATER_LEVEL), treasureLocation);
         }
     };
 
-    var displayReadyToBegin = function() {
+    var displayIntroductionScreen = function() {
         document.getElementById("loadingcontent").innerHTML = "Click Anywhere to Begin";
         document.getElementById("loading").addEventListener("click", function(evt) {
             document.getElementById("loading").style.display = "none";
@@ -465,11 +465,11 @@ function createScene() {
         });
     };
 
-    scene.executeWhenReady(placeTreasure);
-    scene.executeWhenReady(placeAllHintBoxes);
-    scene.executeWhenReady(addCameraAtRandomPosition);
-    scene.executeWhenReady(startLoadingTrees);
-    scene.executeWhenReady(displayReadyToBegin);
+    scene.executeWhenReady(placeTreasureRandomly);
+    scene.executeWhenReady(placeHintboxesRandomly);
+    scene.executeWhenReady(placeCameraRandomly);
+    scene.executeWhenReady(placeTreesRandomly);
+    scene.executeWhenReady(displayIntroductionScreen);
     scene.executeWhenReady(startRenderLoop);
 }
 
