@@ -38,10 +38,8 @@ img.save(OUTPUT_PATH)
 print "Noise generated"
 
 # Advanced terrain shapping
-##Parameters
 CLIP_POINTS = (70,200)
 
-##
 spread = CLIP_POINTS[1] - CLIP_POINTS[0]
 for x in range(IMAGE_WIDTH):
     for y in range(IMAGE_HEIGHT):

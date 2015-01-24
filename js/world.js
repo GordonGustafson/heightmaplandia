@@ -38,8 +38,8 @@ function getGroundHeight(x, z){
 }
 
 function getRandomPositionOnGround() {
-     // Returns a random integer between min (inclusive) and max (inclusive)
-     // Using Math.round() will give you a non-uniform distribution!
+    // Returns a random integer between min (inclusive) and max (inclusive)
+    // Using Math.round() will give you a non-uniform distribution!
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
@@ -231,7 +231,7 @@ function playAudio() {
         }
     }, false);
     audio.play();
-    
+
 }
 
 function showElapsedTime(status){
@@ -265,12 +265,12 @@ function placeTreasureAt(treasureLocation) {
 
     BABYLON.SceneLoader.ImportMesh("", "blender/", "treasure_chest.babylon", scene, treasureLoadCallback);
 
-    
+
     window.addEventListener("click", function (evt) {
         var pickResult = scene.pick(evt.clientX, evt.clientY);
         if (pickResult.pickedMesh === treasureBox || pickResult.pickedMesh === treasureLid) {
             treasureBox.isVisible = false;
-            treasureLid.isVisible = false;                
+            treasureLid.isVisible = false;
             document.getElementById("victory").style.display = "inline";
             showElapsedTime("W");
         }
@@ -301,8 +301,8 @@ function placeHintboxAt(hintboxLocation, destination) {
 
         var animationFPS = 30;
         var hintboxAnimation = new BABYLON.Animation("hintbox_flying", "position", animationFPS,
-                                                 BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
-                                                 BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+                                                     BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+                                                     BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
         hintboxAnimation.setKeys(animationKeys);
         hintbox.animations.push(hintboxAnimation);
         scene.beginAnimation(hintbox, 0, 200, true);
@@ -382,7 +382,7 @@ function createScene() {
         //Add listener for help window and parameters window
         var helpMenuUp = false;
         window.addEventListener("keydown", function(event){
-            if (event.keyCode == 72) {  
+            if (event.keyCode == 72) {
                 if (helpMenuUp){
                     document.getElementById("helpMenu").style.display = "none";
                     document.getElementById("pos").style.display = "none";
@@ -394,7 +394,7 @@ function createScene() {
                     helpMenuUp = true;
                 }
             };
-            if (event.keyCode == 80) {  
+            if (event.keyCode == 80) {
                 if (helpMenuUp){
                     document.getElementById("params").style.display = "none";
                     helpMenuUp = false;
@@ -432,14 +432,14 @@ function createScene() {
             currentParticleSystem.stop();
         }
     };
-    
+
     var checkDrowning = function() {
         cameraPosition = scene.activeCamera.position.y;
         if (DROWN_COUNTER >= DROWN_TIME){
             engine.stopRenderLoop();
             document.getElementById("drowning").style.display = "none";
             document.getElementById("drowningMessage").style.display = "none";
-            document.getElementById("lost").style.display = "inline";         
+            document.getElementById("lost").style.display = "inline";
             showElapsedTime("L");
         }
         else{
