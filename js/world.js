@@ -412,19 +412,16 @@ function createScene() {
         if (DROWN_COUNTER >= DROWN_TIME){
             engine.stopRenderLoop();
             document.getElementById("drowning").style.display = "none";
-            document.getElementById("drowningMessage").style.display = "none";
             document.getElementById("lost").style.display = "inline";
             showElapsedTime("L");
         }
         else{
             if (cameraPosition < -.2){
                 document.getElementById("drowning").style.display = "inline";
-                document.getElementById("drowningMessage").style.display = "inline";
                 DROWN_COUNTER += 1;
             }
             else{
                 document.getElementById("drowning").style.display = "none";
-                document.getElementById("drowningMessage").style.display = "none";
                 DROWN_COUNTER = 0;
             }
         }
