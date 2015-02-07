@@ -209,31 +209,6 @@ function addWater(){
     water.material = waterMaterial;
 }
 
-function playAudio() {
-    var audio  = document.createElement('audio');
-    audio.volume = .5;
-    audio.src = "audio/song.mp3"
-    audio.addEventListener('ended', function() {
-        this.currentTime = 0;
-        this.play();
-    }, false);
-    var playing = true;
-    window.addEventListener('keydown', function(evt){
-        if(evt.keyCode == 77){
-            if(playing){
-                audio.pause();
-                playing = false;
-            }
-            else{
-                audio.play();
-                playing = true;
-            }
-        }
-    }, false);
-    audio.play();
-
-}
-
 function showElapsedTime(status){
     var b = new Date();
     END_TIME = Date.parse(b);
@@ -353,7 +328,6 @@ function createScene() {
     addHeightmappedGround();
     addSkybox();
     addWater();
-    playAudio();
 
     scene.gravity = NORMAL_GRAVITY;
 
